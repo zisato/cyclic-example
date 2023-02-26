@@ -1,15 +1,5 @@
-import express, { Request, Response, Router } from 'express'
+import { App } from './app'
 
-const app = express()
-const port = process.env.PORT || 3000
+const app = new App
 
-const router = Router()
-router.get('/', (_req: Request, res: Response) => {
-    res.json({'hello': 'world'})
-})
-
-app.use(router)
-
-app.listen(port, () => {
-    console.log(`Server start in port ${port}`)
-})
+app.startServer()
