@@ -5,7 +5,7 @@
   "main": "build/src/index.js",
   "scripts": {
     "build": "tsc --build",
-    "dev": "ts-node-dev src/index.ts",
+    "dev": "NODE_ENV=development ts-node-dev src/index.ts",
     "lint": "ts-standard",
     "start": "node build/src/index.js",
     "test": "NODE_ENV=test jest --config=jest.config.ts --coverage",

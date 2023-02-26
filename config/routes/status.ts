@@ -1,14 +1,14 @@
 import { Container } from '../../src/kernel/container/container'
 import { Router } from 'express'
 import { RouteLoader } from '../../src/kernel/bundles/express-server-bundle'
-import IndexController from '../../src/infrastructure/controller/index-controller'
+import StatusController from '../../src/infrastructure/controller/status-controller'
 
-export class IndexRouteLoader implements RouteLoader {
+export class StatusRouteLoader implements RouteLoader {
     loadRoutes (container: Container): Router[] {
         const router = Router()
 
-        const indexController = container.getTyped(IndexController)
-        router.get('/', indexController.handle)
+        const statusController = container.getTyped(StatusController)
+        router.get('/status', statusController.handle)
 
         return [router]
     }

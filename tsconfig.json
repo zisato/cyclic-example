@@ -103,6 +103,6 @@
   "include": [
     "src/**/*.ts",
     "config/**/*.ts",
-    "config/default.json"
+    "config/default.js"
   ]
 }
