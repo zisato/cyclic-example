@@ -1,0 +1,12 @@
+{
+  "container": {
+    "loadModules": []
+  },
+  "expressServer": {
+    "port": 3000,
+    "middlewares": [
+      "express.json",
+      "express.cors"
+    ]
+  }
+}

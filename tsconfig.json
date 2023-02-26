@@ -102,6 +102,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "config/**/*.ts"
+    "config/**/*.ts",
+    "config/default.json"
   ]
 }
