@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  nodejs:
+    image: node:19-buster
+    environment:
+      - HTTP_PORT=3000
+      - NODE_ENV=development
+    ports:
+      - 3000:3000
+    working_dir: /src
+    volumes:
+      - ./:/src
+    command: npm run dev
