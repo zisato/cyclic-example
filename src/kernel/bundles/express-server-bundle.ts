@@ -143,17 +143,7 @@ export class ExpressServerBundle extends AbstractBundle {
       return typeof value !== 'string' && 'express.static' in value
     })
     if (indexStatic > -1) {
-      containerBuilder.register('express.static', asValue(express.static(middlewareIds[indexStatic]['express.static']['dir'], {
-        dotfiles: middlewareIds[indexStatic]['express.static']['dotfiles'],
-        etag: middlewareIds[indexStatic]['express.static']['etag'],
-        extensions: middlewareIds[indexStatic]['express.static']['extensions'],
-        fallthrough: middlewareIds[indexStatic]['express.static']['fallthrough'],
-        immutable: middlewareIds[indexStatic]['express.static']['immutable'],
-        index: middlewareIds[indexStatic]['express.static']['index'],
-        lastModified: middlewareIds[indexStatic]['express.static']['lastModified'],
-        maxAge: middlewareIds[indexStatic]['express.static']['maxAge'],
-        redirect: middlewareIds[indexStatic]['express.static']['redirect']
-      })))
+      containerBuilder.register('express.static', asValue(express.static(middlewareIds[indexStatic]['express.static']['dir'])))
     }
   }
 
