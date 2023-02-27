@@ -4,10 +4,10 @@
   "description": "",
   "main": "build/src/index.js",
   "scripts": {
-    "build": "rm -rf build/ && tsc --build",
+    "build": "rm -rf build/ && NODE_ENV=production tsc --build",
     "dev": "NODE_ENV=development ts-node-dev src/index.ts",
     "lint": "ts-standard",
-    "start": "ts-node build/src/index.js",
+    "start": "NODE_ENV=production node build/src/index.js",
     "test": "NODE_ENV=test jest --config=jest.config.ts --coverage",
     "tsc": "tsc",
     "watch": "tsc -w -p ."

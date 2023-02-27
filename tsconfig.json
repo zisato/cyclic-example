@@ -102,11 +102,10 @@
   },
   "include": [
     "src/**/*.ts",
-    "config/**/*.ts",
-    "config/default.js"
+    "config/routes/*.ts",
+    "config/production.js"
   ],
   "exclude": [
-    "config/development.*",
-    "config/test.*"
+    "config/!(production).*"
   ]
 }
