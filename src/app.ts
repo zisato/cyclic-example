@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { IndexRouteLoader } from "../config/routes";
+import { IndexRouteLoader } from "../config/routes/index";
 import { StatusRouteLoader } from "../config/routes/status";
 import { Bundle } from "./kernel/bundle/bundle";
 import { AxilixContainerBuilderConfigBundle } from "./kernel/bundles/awilix-container-builder-config-bundle";
