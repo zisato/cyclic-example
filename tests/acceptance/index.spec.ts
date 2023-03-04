@@ -25,12 +25,11 @@ describe('Index acceptance test', () => {
     expect(response.statusCode).toEqual(200)
   })
 
-  test('When valid request returns response body', async () => {
+  test('When valid request returns response html', async () => {
     // When
     const response = await request(server).get(route).send()
 
     // Then
-    const expectedResponseBody = { hello: 'world' }
-    expect(response.body).toEqual(expectedResponseBody)
+    expect(response.text).not.toBeUndefined()
   })
 })

@@ -21,8 +21,8 @@ export abstract class HttpKernel extends Kernel {
   async startServer (): Promise<Server> {
     await this.boot()
     const bundleName = this.httpServerBundleName()
-    const server = this.getServer(bundleName)
     const port = this.getPort(bundleName)
+    const server = this.getServer(bundleName)
 
     return await server.start(port)
   }
@@ -31,15 +31,21 @@ export abstract class HttpKernel extends Kernel {
     return []
   }
 
-  private getServer (bundleName: string): HttpServer {
-    const container = this.getContainer()
-
-    return container.get<HttpServer>(`${bundleName}.server`)
-  }
-
   private getPort (bundleName: string): number {
     const configuration = this.getConfiguration()
+    if (!configuration.has(`${bundleName}.port`)) {
+      throw new Error(`HttpKernel requires ${bundleName}.port in configuration`)
+    }
 
     return configuration.get<number>(`${bundleName}.port`)
+  }
+
+  private getServer (bundleName: string): HttpServer {
+    const container = this.getContainer()
+    if (!container.has(`${bundleName}.server`)) {
+      throw new Error(`HttpKernel requires ${bundleName}.server in container`)
+    }
+
+    return container.get<HttpServer>(`${bundleName}.server`)
   }
 }

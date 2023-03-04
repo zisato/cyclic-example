@@ -4,6 +4,7 @@ import Joi, { ObjectSchema } from 'joi'
 import { AbstractBundle } from '../../src/kernel/bundle/abstract-bundle'
 import { Bundle } from '../../src/kernel/bundle/bundle'
 import { Configuration } from '../../src/kernel/container/configuration'
+import { BundleConfigurationNotExistsError } from '../../src/kernel/exception/bundle-configuration-not-exists-error'
 import { BundleConfigurationRequiredError } from '../../src/kernel/exception/bundle-configuration-required-error'
 import { BundleConfigurationValidationError } from '../../src/kernel/exception/bundle-configuration-validation-error'
 import { BundleNameDuplicatedError } from '../../src/kernel/exception/bundle-name-duplicated-error'
@@ -33,20 +34,12 @@ class NullConfigTestBundle extends AbstractBundle {
 }
 
 class TestKernel extends Kernel {
-  bundles (): Bundle[] {
-    return [
-      new NullConfigTestBundle(),
-      new TestBundle()
-    ]
+  constructor (private readonly loadedBundles: Bundle[]) {
+    super()
   }
-}
 
-class DuplicatedBundlesTestKernel extends Kernel {
   bundles (): Bundle[] {
-    return [
-      new TestBundle(),
-      new TestBundle()
-    ]
+    return this.loadedBundles
   }
 }
 
@@ -55,8 +48,16 @@ describe('Kernel unit test suite', () => {
     jest.resetAllMocks()
   })
 
+  function givenATestKernel(bundles: Bundle[] | null = null): TestKernel {
+    bundles = bundles ?? [
+      new NullConfigTestBundle(),
+      new TestBundle()
+    ]
+    return new TestKernel(bundles)
+  }
+
   test('Should throw error when getConfiguration in non booted kernel', () => {
-    const kernel = new TestKernel()
+    const kernel = givenATestKernel()
 
     expect(() => {
       kernel.getConfiguration()
@@ -64,7 +65,7 @@ describe('Kernel unit test suite', () => {
   })
 
   test('Should throw error when getContainer in non booted kernel', () => {
-    const kernel = new TestKernel()
+    const kernel = givenATestKernel()
 
     expect(() => {
       kernel.getContainer()
@@ -77,15 +78,31 @@ describe('Kernel unit test suite', () => {
       testBundle: {}
     })
 
-    const kernel = new DuplicatedBundlesTestKernel()
+    const kernel = givenATestKernel([
+      new TestBundle(),
+      new TestBundle()
+    ])
 
     const promise = kernel.boot()
 
     await expect(promise).rejects.toThrowError(BundleNameDuplicatedError)
   })
 
+  test('Should return empty array as default bundles', async () => {
+    const kernel = givenATestKernel([])
+    const configMock = jest.spyOn(config.util, 'toObject')
+    configMock.mockReturnValueOnce({
+      testBundle: {}
+    })
+
+    const result = kernel.bundles()
+
+    const expectedBundles: Bundle[] = []
+    expect(result).toEqual(expectedBundles)
+  })
+
   test('Should return bundles', () => {
-    const kernel = new TestKernel()
+    const kernel = givenATestKernel()
     const configMock = jest.spyOn(config.util, 'toObject')
     configMock.mockReturnValueOnce({
       testBundle: {}
@@ -101,23 +118,35 @@ describe('Kernel unit test suite', () => {
       jest.resetAllMocks()
     })
 
-    test('Should load config from bundles igoring rest', async () => {
-      const kernel = new TestKernel()
+    test('Should throw error when config not exists', async () => {
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
-        ignoreProperty: true,
+        testBundle: {},
+        notExistsBundle: {}
+      })
+  
+      const kernel = givenATestKernel()
+  
+      const promise = kernel.boot()
+  
+      await expect(promise).rejects.toThrowError(BundleConfigurationNotExistsError)
+    })
+
+    test('Should load config from bundles', async () => {
+      const kernel = givenATestKernel()
+      const configMock = jest.spyOn(config.util, 'toObject')
+      configMock.mockReturnValueOnce({
         testBundle: {}
       })
 
       await kernel.boot()
       const configuration = kernel.getConfiguration()
 
-      expect(configuration.has('ignoreProperty')).toBeFalsy()
       expect(configuration.has('testBundle.property')).toBeTruthy()
     })
 
     test('Should use default value', async () => {
-      const kernel = new TestKernel()
+      const kernel = givenATestKernel()
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
         testBundle: {}
@@ -130,7 +159,7 @@ describe('Kernel unit test suite', () => {
     })
 
     test('Should use configured value', async () => {
-      const kernel = new TestKernel()
+      const kernel = givenATestKernel()
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
         testBundle: {
@@ -145,7 +174,7 @@ describe('Kernel unit test suite', () => {
     })
 
     test('When bundle config not null and not in config file throw error', async () => {
-      const kernel = new TestKernel()
+      const kernel = givenATestKernel()
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({})
 
@@ -155,7 +184,7 @@ describe('Kernel unit test suite', () => {
     })
 
     test('When bundle config error validation throw error', async () => {
-      const kernel = new TestKernel()
+      const kernel = givenATestKernel()
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
         testBundle: {
@@ -175,7 +204,7 @@ describe('Kernel unit test suite', () => {
     })
 
     test('Should load bundles container', async () => {
-      const kernel = new TestKernel()
+      const kernel = givenATestKernel()
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
         testBundle: {}
@@ -190,7 +219,7 @@ describe('Kernel unit test suite', () => {
 
   describe('shutdown', () => {
     test('set configuration as null', async () => {
-      const kernel = new TestKernel()
+      const kernel = givenATestKernel()
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
         testBundle: {}
@@ -205,7 +234,7 @@ describe('Kernel unit test suite', () => {
     })
 
     test('set container as null', async () => {
-      const kernel = new TestKernel()
+      const kernel = givenATestKernel()
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
         testBundle: {}

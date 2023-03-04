@@ -32,6 +32,8 @@ export interface RouteLoader {
   loadRoutes: (container: Container) => Router[]
 }
 
+type MiddlewareConfigurationSchema = string | { [key: string]: any }
+
 export class ExpressServerBundle extends AbstractBundle {
   private readonly routeLoader: RouteLoader
   private readonly preServerStart: PreServerStart
@@ -65,41 +67,27 @@ export class ExpressServerBundle extends AbstractBundle {
         dir: joi.string().required()
       })
     })
-    const jsonSchema = joi.object({
-      'express.json': joi.object({
-        inflate: joi.boolean().default(true),
-        limit: joi.alternatives().try(joi.string(), joi.number()).default('100kb'),
-        strict: joi.boolean().default(true),
-        type: joi.alternatives().try(joi.string(), joi.array().items(joi.string())).default('application/json')
-      })
-    })
 
     return joi.object({
       port: joi.number().default(3000),
-      middlewares: joi.array().items(joi.string(), corsSchema, staticSchema, jsonSchema).default([]),
+      middlewares: joi.array().items(joi.string(), corsSchema, staticSchema).default([]),
       errorHandlers: joi.array().items(joi.string()).default([])
     })
   }
 
   loadContainer (containerBuilder: AwilixContainer, bundleConfiguration: Configuration): void {
-    const middlewareIds = bundleConfiguration.get<string[] | Array<{ [key: string]: unknown }>>('expressServer.middlewares')
-    this.loadExpressMiddlewares(containerBuilder, bundleConfiguration)
-    const normalizedMiddlewareIds = middlewareIds.map((value: string | { [key: string]: unknown }): string => {
-      if (typeof value === 'string') {
-        return value
-      }
-
-      return Object.keys(value)[0]
-    })
+    const middlewareConfigurations = bundleConfiguration.get<MiddlewareConfigurationSchema[]>('expressServer.middlewares')
+    this.loadExpressMiddlewares(containerBuilder, middlewareConfigurations)
+    const middlewareIds = this.getMiddlewareIds(middlewareConfigurations)
 
     const compiledContainer = new CompiledContainer(containerBuilder)
-    const middlewares = this.resolveMiddlewares(compiledContainer, normalizedMiddlewareIds)
+    const middlewares = this.resolveMiddlewares(compiledContainer, middlewareIds)
     const errorHandlers = this.resolveErrorHandlers(compiledContainer, bundleConfiguration.get<string[]>('expressServer.errorHandlers'))
     const routes = this.resolveRoutes(compiledContainer)
     const preServerStartMethods = this.preServerStart.loadMethods(compiledContainer, bundleConfiguration)
 
     containerBuilder.register({
-      'expressServer.server': asValue(new ExpressHttpServer(middlewares, errorHandlers, routes, preServerStartMethods))
+      'expressServer.server': asValue(new ExpressHttpServer(express(), middlewares, errorHandlers, routes, preServerStartMethods))
     })
   }
 
@@ -109,42 +97,46 @@ export class ExpressServerBundle extends AbstractBundle {
     await server.stop()
   }
 
-  private loadExpressMiddlewares (containerBuilder: AwilixContainer, bundleConfiguration: Configuration): void {
-    const middlewareIds = bundleConfiguration.get<string[] | any[]>('expressServer.middlewares')
-
-    if (middlewareIds.includes('express.json')) {
-      containerBuilder.register('express.json', asValue(express.json()))
-    }
-    const indexJson = middlewareIds.findIndex((value) => {
-      return typeof value !== 'string' && 'express.json' in value
-    })
-    if (indexJson > -1) {
-      containerBuilder.register('express.json', asValue(express.json({
-        inflate: middlewareIds[indexJson]['express.json']['inflate'],
-        limit: middlewareIds[indexJson]['express.json']['limit'],
-        strict: middlewareIds[indexJson]['express.json']['strict'],
-        type: middlewareIds[indexJson]['express.json']['type']
-      })))
-    }
-
-    if (middlewareIds.includes('express.cors')) {
+  private loadExpressMiddlewares (containerBuilder: AwilixContainer, middlewareConfigurations: MiddlewareConfigurationSchema[]): void {
+    const middlewaresAsString = middlewareConfigurations.filter((middleware: MiddlewareConfigurationSchema) => {
+      return typeof middleware === 'string'
+    }) as string[]
+    if (middlewaresAsString.includes('express.cors')) {
       containerBuilder.register('express.cors', asValue(cors()))
     }
-    const indexCors = middlewareIds.findIndex((value) => {
-      return typeof value !== 'string' && 'express.cors' in value
+    if (middlewaresAsString.includes('express.json')) {
+      containerBuilder.register('express.json', asValue(express.json()))
+    }
+
+    const middlewaresAsObject = middlewareConfigurations.filter((middleware: MiddlewareConfigurationSchema) => {
+      return typeof middleware === 'object'
+    }) as Array<{ [key: string]: any }>
+
+    const corsConfiguration = middlewaresAsObject.find((value) => {
+      return 'express.cors' in value
     })
-    if (indexCors > -1) {
+    if (corsConfiguration !== undefined) {
       containerBuilder.register('express.cors', asValue(cors({
-        origin: middlewareIds[indexCors]['express.cors']['origin']
+        origin: corsConfiguration['express.cors']['origin']
       })))
     }
 
-    const indexStatic = middlewareIds.findIndex((value) => {
-      return typeof value !== 'string' && 'express.static' in value
+    const staticConfiguration = middlewaresAsObject.find((value) => {
+      return 'express.static' in value
     })
-    if (indexStatic > -1) {
-      containerBuilder.register('express.static', asValue(express.static(middlewareIds[indexStatic]['express.static']['dir'])))
+    if (staticConfiguration !== undefined) {
+      containerBuilder.register('express.static', asValue(express.static(staticConfiguration['express.static']['dir'])))
     }
+  }
+
+  private getMiddlewareIds(middlewareConfigurations: Array<string | { [key: string]: unknown }>): string[] {
+    return middlewareConfigurations.map((value: string | { [key: string]: unknown }): string => {
+      if (typeof value === 'string') {
+        return value
+      }
+
+      return Object.keys(value)[0]
+    })
   }
 
   private resolveMiddlewares (container: Container, middlewares: string[]): RequestHandler[] {
@@ -191,16 +183,15 @@ export class ExpressServerBundle extends AbstractBundle {
 
 export class ExpressHttpServer implements HttpServer {
   protected isBooted: boolean = false
-  private readonly app: express.Express
   private server: Server | null = null
 
   constructor (
+    private readonly app: express.Express,
     private readonly middlewares: RequestHandler[],
     private readonly errorHandlerMiddlewares: ErrorHandlerMiddleware[],
     private readonly routes: Router[],
-    private readonly preServerStart: PreServerStartMethod[]) {
-    this.app = express()
-  }
+    private readonly preServerStart: PreServerStartMethod[]
+  ) {}
 
   boot = async (): Promise<void> => {
     if (!this.isBooted) {
@@ -224,7 +215,7 @@ export class ExpressHttpServer implements HttpServer {
     await this.boot()
 
     const promises = this.preServerStart.map(async (method: PreServerStartMethod): Promise<void> => {
-      return await method()
+      return method()
     })
 
     await Promise.all(promises)

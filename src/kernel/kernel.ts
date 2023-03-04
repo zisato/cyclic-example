@@ -4,6 +4,7 @@ import { createContainer } from 'awilix'
 import { Configuration } from './container/configuration'
 import { Json, JsonConfiguration } from './container/json-configuration'
 import { Bundle } from './bundle/bundle'
+import { BundleConfigurationNotExistsError } from './exception/bundle-configuration-not-exists-error'
 import { BundleConfigurationRequiredError } from './exception/bundle-configuration-required-error'
 import { BundleConfigurationValidationError } from './exception/bundle-configuration-validation-error'
 import { KernelError } from './exception/kernel-error'
@@ -21,7 +22,6 @@ export abstract class Kernel {
 
       const configuration = await this.loadConfiguration()
       const container = this.loadContainer(configuration)
-
       this.bootBundles(container, configuration)
 
       this.configuration = configuration
@@ -65,6 +65,7 @@ export abstract class Kernel {
 
   private async loadConfiguration (): Promise<Configuration> {
     const currentConfiguration = config.util.toObject()
+    this.ensureConfigurationExistsInBundles(currentConfiguration)
     const prependConfiguration = await this.loadBundlesPrependConfiguration(currentConfiguration)
     const configuration = config.util.extendDeep({}, currentConfiguration, prependConfiguration)
     const bundlesConfiguration = this.loadBundlesConfiguration(configuration)
@@ -141,5 +142,17 @@ export abstract class Kernel {
 
       existingBundleNames = { ...existingBundleNames, [bundleName]: true }
     })
+  }
+
+  private ensureConfigurationExistsInBundles(configuration: Json): void {
+    const bundleNames = this.bundles().map((bundle: Bundle) => {
+      return bundle.name()
+    })
+
+    for (const bundleName in configuration) {
+      if (!bundleNames.includes(bundleName)) {
+        throw new BundleConfigurationNotExistsError()
+      }
+    }
   }
 }
