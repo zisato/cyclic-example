@@ -1,6 +1,7 @@
-import { asClass, AwilixContainer } from "awilix";
+import { aliasTo, asClass, AwilixContainer } from "awilix";
 import { Router } from "express";
 import { IndexRouteLoader } from "../config/routes/index";
+import { ProductRouteLoader } from "../config/routes/product";
 import { StatusRouteLoader } from "../config/routes/status";
 import { InvalidArgumentError } from "./domain/error/invalid-argument-error";
 import { InvalidJsonSchemaError } from "./infrastructure/error/invalid-json-schema-error";
@@ -17,6 +18,7 @@ class AppRouteLoader implements RouteLoader {
         return [
             ...(new IndexRouteLoader().loadRoutes(container)),
             ...(new StatusRouteLoader().loadRoutes(container)),
+            ...(new ProductRouteLoader().loadRoutes(container))
         ]
     }
 }
@@ -28,6 +30,7 @@ class AppBundle extends AbstractBundle {
 
     loadContainer(containerBuilder: AwilixContainer<any>, _bundleConfiguration: Configuration): void {
         containerBuilder.register({
+            productRepository: aliasTo('inMemoryProductRepository'),
             appErrorHandlerMiddleware: asClass(AppErrorHandlerMiddleware).inject(() => ({
                 errorMapping: new Map<string, number>([
                     [InvalidArgumentError.name, 400],
