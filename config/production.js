@@ -2,8 +2,11 @@ const path = require('path');
 
 module.exports = {
   container: {
-    loadModules: [
-      path.join(__dirname, '..', 'build', 'src', 'infrastructure', '**', '*.js')
-    ]
+    loadModules: {
+      patterns: [
+        path.join(__dirname, '..', 'build', 'src', 'infrastructure', '**', '*.js'),
+        path.join(__dirname, '..', 'build', 'src', 'application', '**', '*.js')
+      ]
+    }
   }
 }

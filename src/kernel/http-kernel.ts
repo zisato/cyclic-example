@@ -1,6 +1,7 @@
 import { Server } from 'http'
 import { Configuration } from './container/configuration'
 import { Container } from './container/container'
+import { HttpKernelError } from './exception/http-kernel-error'
 import { Kernel } from './kernel'
 
 export interface HttpServer {
@@ -34,7 +35,7 @@ export abstract class HttpKernel extends Kernel {
   private getPort (bundleName: string): number {
     const configuration = this.getConfiguration()
     if (!configuration.has(`${bundleName}.port`)) {
-      throw new Error(`HttpKernel requires ${bundleName}.port in configuration`)
+      throw new HttpKernelError(`HttpKernel requires ${bundleName}.port in configuration`)
     }
 
     return configuration.get<number>(`${bundleName}.port`)
@@ -43,7 +44,7 @@ export abstract class HttpKernel extends Kernel {
   private getServer (bundleName: string): HttpServer {
     const container = this.getContainer()
     if (!container.has(`${bundleName}.server`)) {
-      throw new Error(`HttpKernel requires ${bundleName}.server in container`)
+      throw new HttpKernelError(`HttpKernel requires ${bundleName}.server in container`)
     }
 
     return container.get<HttpServer>(`${bundleName}.server`)

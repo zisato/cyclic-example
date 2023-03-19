@@ -8,6 +8,7 @@ import { Configuration } from '../container/configuration'
 import { Container } from '../container/container'
 import { AwilixContainer as CompiledContainer } from '../container/awilix-container'
 import { HttpServer, PreServerStart, PreServerStartMethod } from '../http-kernel'
+import { ExpressServerError } from '../exception/express-server-error'
 
 export interface ErrorHandlerMiddleware {
   handle: (
@@ -157,7 +158,7 @@ export class ExpressServerBundle extends AbstractBundle {
         return middleware
       }
 
-      throw new Error(`middleware ${middlewareId} not valid instance of RequestHandlerMiddleware or RequestHandler`)
+      throw new ExpressServerError(`middleware ${middlewareId} not valid instance of RequestHandlerMiddleware or RequestHandler`)
     })
   }
 
@@ -169,7 +170,7 @@ export class ExpressServerBundle extends AbstractBundle {
     return errorHandlers.map((errorHandlerId: string): ErrorHandlerMiddleware => {
       const errorHandler = container.get(errorHandlerId)
       if (!isErrorHandler(errorHandler)) {
-        throw new Error(`errorHandler ${errorHandlerId} not valid instance of ErrorHandlerMiddleware`)
+        throw new ExpressServerError(`errorHandler ${errorHandlerId} not valid instance of ErrorHandlerMiddleware`)
       }
 
       return errorHandler

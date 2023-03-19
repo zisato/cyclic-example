@@ -53,7 +53,7 @@ class TestHttpKernel extends HttpKernel {
     return this.serverBundleName
   }
 
-  bundles (): Bundle[] {
+  registerBundles (): Bundle[] {
     return this.loadedBundles
   }
 }

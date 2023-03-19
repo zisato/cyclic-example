@@ -5,20 +5,23 @@ import { Configuration } from './container/configuration'
 import { Json, JsonConfiguration } from './container/json-configuration'
 import { Bundle } from './bundle/bundle'
 import { BundleConfigurationNotExistsError } from './exception/bundle-configuration-not-exists-error'
-import { BundleConfigurationRequiredError } from './exception/bundle-configuration-required-error'
 import { BundleConfigurationValidationError } from './exception/bundle-configuration-validation-error'
 import { KernelError } from './exception/kernel-error'
 import { BundleNameDuplicatedError } from './exception/bundle-name-duplicated-error'
 import { AwilixContainer } from './container/awilix-container'
+import { AxilixContainerBundle } from './bundles/awilix-container-bundle'
 
 export abstract class Kernel {
   protected isBooted: boolean = false
+  private bundles: Bundle[] = []
   private configuration: Configuration | null = null
   private container: Container | null = null
 
+  abstract registerBundles (): Bundle[]
+
   async boot (): Promise<void> {
     if (!this.isBooted) {
-      this.ensureUniqueBundleName()
+      this.loadBundles()
 
       const configuration = await this.loadConfiguration()
       const container = this.loadContainer(configuration)
@@ -57,10 +60,6 @@ export abstract class Kernel {
     return this.container
   }
 
-  bundles (): Bundle[] {
-    return []
-  }
-
   async preShutdown (): Promise<void> {}
 
   private async loadConfiguration (): Promise<Configuration> {
@@ -74,9 +73,11 @@ export abstract class Kernel {
   }
 
   private loadContainer (configuration: Configuration): Container {
-    const container = createContainer()
+    const container = createContainer({
+      injectionMode: configuration.get('container.injectionMode')
+    })
 
-    this.bundles().forEach((bundle: Bundle) => {
+    this.bundles.forEach((bundle: Bundle) => {
       bundle.loadContainer(container, configuration)
     })
 
@@ -84,7 +85,7 @@ export abstract class Kernel {
   }
 
   private bootBundles (container: Container, configuration: Configuration): void {
-    this.bundles().forEach((bundle: Bundle) => {
+    this.bundles.forEach((bundle: Bundle) => {
       bundle.boot(container, configuration)
     })
   }
@@ -92,7 +93,7 @@ export abstract class Kernel {
   private async shutdownBundles (): Promise<void> {
     const container = this.getContainer()
 
-    for (const bundle of this.bundles()) {
+    for (const bundle of this.bundles) {
       await bundle.shutdown(container)
     }
   }
@@ -100,7 +101,7 @@ export abstract class Kernel {
   private async loadBundlesPrependConfiguration (currentConfiguration: Configuration): Promise<Json> {
     let result = {}
 
-    for (const bundle of this.bundles()) {
+    for (const bundle of this.bundles) {
       const prependConfig = await bundle.prependConfig(currentConfiguration)
       result = { ...result, ...prependConfig }
     }
@@ -108,18 +109,16 @@ export abstract class Kernel {
     return result
   }
 
-  private loadBundlesConfiguration (currentConfig: Json): Json {
-    return this.bundles().reduce((acc, bundle) => {
-      const configSchema = bundle.configSchema()
+  private loadBundlesConfiguration (config: Json): Json {
+    return this.bundles.reduce((acc, bundle) => {
+      let configSchema = bundle.configSchema()
       if (configSchema === null) {
         return acc
       }
 
-      if (!(bundle.name() in currentConfig)) {
-        throw new BundleConfigurationRequiredError(`Bundle ${bundle.name()} requires a config schema`)
-      }
+      const currentConfig = config[bundle.name()] ?? {}
 
-      const { value: bundleConfig, error } = configSchema.validate(currentConfig[bundle.name()])
+      const { value: bundleConfig, error } = configSchema.validate(currentConfig)
 
       if (error !== undefined) {
         throw new BundleConfigurationValidationError(`Bundle ${bundle.name()} config validation error: ${error.message}`)
@@ -129,23 +128,25 @@ export abstract class Kernel {
     }, {})
   }
 
-  private ensureUniqueBundleName (): void {
-    const bundleNames = this.bundles().map((bundle: Bundle) => {
-      return bundle.name()
-    })
-
-    let existingBundleNames = {}
-    bundleNames.forEach((bundleName: string) => {
-      if (bundleName in existingBundleNames) {
+  private loadBundles (): void {
+    const bundles = [
+      new AxilixContainerBundle(),
+      ...this.registerBundles()
+    ]
+    const existingBundleNames: string[] = []
+    bundles.forEach((bundle: Bundle) => {
+      const bundleName = bundle.name()
+      if (existingBundleNames.includes(bundleName)) {
         throw new BundleNameDuplicatedError(`Trying to load two bundles with same name ${bundleName}`)
       }
 
-      existingBundleNames = { ...existingBundleNames, [bundleName]: true }
+      existingBundleNames.push(bundleName)
+      this.bundles.push(bundle)
     })
   }
 
   private ensureConfigurationExistsInBundles(configuration: Json): void {
-    const bundleNames = this.bundles().map((bundle: Bundle) => {
+    const bundleNames = this.bundles.map((bundle: Bundle) => {
       return bundle.name()
     })
 

@@ -2,7 +2,11 @@ const path = require('path');
 
 module.exports = {
   container: {
-    loadModules: []
+    loadModules: {
+      patterns: [],
+      lifetime: 'SCOPED',
+      injectionMode: 'CLASSIC'
+    }
   },
   expressServer: {
     port: process.env.HTTP_PORT,
@@ -14,6 +18,9 @@ module.exports = {
           dir: path.join(__dirname, '..', 'public')
         }
       }
+    ],
+    errorHandlers: [
+      'appErrorHandlerMiddleware'
     ]
   }
 }
