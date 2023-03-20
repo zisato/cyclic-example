@@ -15,28 +15,85 @@ describe('AxilixContainerBundle unit test', () => {
   })
 
   describe('configSchema', () => {
-    test('Should validate schema successfully', () => {
-      const configuration = {
-        injectionMode: InjectionMode.PROXY,
-        loadModules: {
-          patterns: ['foo'],
-          lifetime: Lifetime.TRANSIENT,
-          injectionMode: InjectionMode.PROXY
+    test.each([
+      [
+        {
+          injectionMode: InjectionMode.PROXY,
+          loadModules: {
+            patterns: ['foo'],
+            lifetime: Lifetime.TRANSIENT,
+            injectionMode: InjectionMode.PROXY
+          }
+        },
+        {
+          injectionMode: InjectionMode.PROXY,
+          loadModules: {
+            patterns: ['foo'],
+            lifetime: Lifetime.TRANSIENT,
+            injectionMode: InjectionMode.PROXY
+          }
         }
-      }
+      ],
+      [
+        {
+          loadModules: {
+            patterns: [
+              [
+                'foo',
+                Lifetime.SINGLETON
+              ]
+            ]
+          }
+        },
+        {
+          injectionMode: InjectionMode.CLASSIC,
+          loadModules: {
+            patterns: [
+              [
+                'foo',
+                Lifetime.SINGLETON
+              ]
+            ],
+            lifetime: Lifetime.SCOPED,
+            injectionMode: InjectionMode.CLASSIC
+          }
+        }
+      ],
+      [
+        {
+          loadModules: {
+            patterns: [
+              [
+                'foo',
+                {
+                  lifetime: Lifetime.SINGLETON
+                }
+              ]
+            ]
+          }
+        },
+        {
+          injectionMode: InjectionMode.CLASSIC,
+          loadModules: {
+            patterns: [
+              [
+                'foo',
+                {
+                  lifetime: Lifetime.SINGLETON
+                }
+              ]
+            ],
+            lifetime: Lifetime.SCOPED,
+            injectionMode: InjectionMode.CLASSIC
+          }
+        }
+      ]
+    ])('Should validate schema successfully', (configuration, expectedConfig) => {
       const schema = bundle.configSchema()
 
       // @ts-expect-error
       const { value: bundleConfig, error } = schema.validate(configuration)
 
-      const expectedConfig = {
-        injectionMode: InjectionMode.PROXY,
-        loadModules: {
-          patterns: ['foo'],
-          lifetime: Lifetime.TRANSIENT,
-          injectionMode: InjectionMode.PROXY
-        }
-      }
       expect(error).toBeUndefined()
       expect(bundleConfig).toEqual(expectedConfig)
     })

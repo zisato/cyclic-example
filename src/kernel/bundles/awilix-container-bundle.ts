@@ -9,16 +9,20 @@ export class AxilixContainerBundle extends AbstractBundle {
   }
 
   configSchema (): ObjectSchema | null {
+    const lifetimeAllowedValues = Object.keys(Lifetime)
+    const injectionModeAllowedValues = Object.keys(InjectionMode)
     const resolverOptionsSchema = joi.object({
-      lifetime: joi.string().valid(...Object.keys(Lifetime)).default(Lifetime.SCOPED)
+      lifetime: joi.string().valid(...lifetimeAllowedValues).default(Lifetime.SCOPED)
     })
-    const patternsSchema = joi.array().items(joi.string(), resolverOptionsSchema)
+    const shorthandLifetimeOptionsSchema = joi.array().items(joi.string(), ...lifetimeAllowedValues)
+    const patternsSchema = joi.array().items(joi.string(), shorthandLifetimeOptionsSchema, resolverOptionsSchema)
+
     return joi.object({
-      injectionMode: joi.string().valid(...Object.keys(InjectionMode)).default(InjectionMode.CLASSIC),
+      injectionMode: joi.string().valid(...injectionModeAllowedValues).default(InjectionMode.CLASSIC),
       loadModules: joi.object({
         patterns: joi.array().items(joi.string(), patternsSchema).default([]),
-        lifetime: joi.string().valid(...Object.keys(Lifetime)).default(Lifetime.SCOPED),
-        injectionMode: joi.string().valid(...Object.keys(InjectionMode)).default(InjectionMode.CLASSIC)
+        lifetime: joi.string().valid(...lifetimeAllowedValues).default(Lifetime.SCOPED),
+        injectionMode: joi.string().valid(...injectionModeAllowedValues).default(InjectionMode.CLASSIC)
       }).default()
     })
   }
