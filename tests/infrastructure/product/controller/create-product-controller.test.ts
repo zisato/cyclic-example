@@ -24,12 +24,17 @@ describe('CreateProductController unit test', () => {
   }
   const controller = new CreateProductController(stubs.createProduct as CreateProduct)
 
-  function getValidRequestBody (id: string, name: string): any {
+  function getValidRequestBody (id: string, name: string, categoryId: string): any {
     return {
       data: {
         id: id,
         attributes: {
           name: name
+        },
+        relationships: {
+          category: {
+            id: categoryId
+          }
         }
       }
     }
@@ -43,7 +48,8 @@ describe('CreateProductController unit test', () => {
     // Given
     const id = '1a3e9968-bba5-11ed-afa1-0242ac120002'
     const name = 'product-name'
-    stubs.request.body = getValidRequestBody(id, name)
+    const categoryId = 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+    stubs.request.body = getValidRequestBody(id, name, categoryId)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -51,7 +57,8 @@ describe('CreateProductController unit test', () => {
     // Then
     const expected = {
       id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
-      name: 'product-name'
+      name: 'product-name',
+      categoryId: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
     }
     expect(stubs.createProduct.execute).toHaveBeenCalledTimes(1)
     expect(stubs.createProduct.execute).toHaveBeenCalledWith(expect.objectContaining(expected))
@@ -61,7 +68,8 @@ describe('CreateProductController unit test', () => {
     // Given
     const id = '1a3e9968-bba5-11ed-afa1-0242ac120002'
     const name = 'product-name'
-    stubs.request.body = getValidRequestBody(id, name)
+    const categoryId = 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+    stubs.request.body = getValidRequestBody(id, name, categoryId)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -75,7 +83,12 @@ describe('CreateProductController unit test', () => {
       data: {
         id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
         attributes: {
-            name: 'product-name'
+          name: 'product-name'
+        },
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
         }
       }
     }
@@ -99,18 +112,61 @@ describe('CreateProductController unit test', () => {
       data: {
         attributes: {
           name: 'product-name'
+        },
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
         }
       }
     },
     { // missing data.attributes
       data: {
         id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
+        }
       }
     },
     { // missing data.attributes.name
       data: {
         id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
-        attributes: {}
+        attributes: {},
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
+        }
+      }
+    },
+    { // missing data.relationships
+      data: {
+        id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
+        attributes: {
+          name: 'product-name'
+        }
+      }
+    },
+    { // missing data.relationships.category
+      data: {
+        id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
+        attributes: {
+          name: 'product-name'
+        },
+        relationships: {}
+      }
+    },
+    { // missing data.relationships.category.id
+      data: {
+        id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
+        attributes: {
+          name: 'product-name'
+        },
+        relationships: {
+          category: {}
+        }
       }
     }
   ])('Should throw Error when missing request body parameters %j', async (requestBody) => {
@@ -131,6 +187,11 @@ describe('CreateProductController unit test', () => {
         id: 123,
         attributes: {
           name: 'product-name'
+        },
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
         }
       }
     },
@@ -139,6 +200,11 @@ describe('CreateProductController unit test', () => {
         id: false,
         attributes: {
           name: 'product-name'
+        },
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
         }
       }
     },
@@ -147,6 +213,11 @@ describe('CreateProductController unit test', () => {
         id: null,
         attributes: {
           name: 'product-name'
+        },
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
         }
       }
     },
@@ -156,6 +227,11 @@ describe('CreateProductController unit test', () => {
         id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
         attributes: {
           name: 123
+        },
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
         }
       }
     },
@@ -163,7 +239,12 @@ describe('CreateProductController unit test', () => {
       data: {
         id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
         attributes: {
-            name: false
+          name: false
+        },
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
         }
       }
     },
@@ -172,6 +253,51 @@ describe('CreateProductController unit test', () => {
         id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
         attributes: {
             name: null
+        },
+        relationships: {
+          category: {
+            id: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+          }
+        }
+      }
+    },
+    // invalid category id
+    {
+      data: {
+        id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
+        attributes: {
+            name: 'product-name'
+        },
+        relationships: {
+          category: {
+            id: 123
+          }
+        }
+      }
+    },
+    {
+      data: {
+        id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
+        attributes: {
+            name: 'product-name'
+        },
+        relationships: {
+          category: {
+            id: false
+          }
+        }
+      }
+    },
+    {
+      data: {
+        id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
+        attributes: {
+            name: 'product-name'
+        },
+        relationships: {
+          category: {
+            id: null
+          }
         }
       }
     }

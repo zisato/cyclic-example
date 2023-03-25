@@ -5,6 +5,7 @@ import { IndexRouteLoader } from "../config/routes/index";
 import { ProductRouteLoader } from "../config/routes/product";
 import { StatusRouteLoader } from "../config/routes/status";
 import { InvalidArgumentError } from "./domain/error/invalid-argument-error";
+import { ModelNotFoundError } from "./domain/error/model-not-found-error";
 import { InvalidJsonSchemaError } from "./infrastructure/error/invalid-json-schema-error";
 import AppErrorHandlerMiddleware from "./infrastructure/express/middleware/app-error-handler-middleware";
 import { AbstractBundle } from "./kernel/bundle/abstract-bundle";
@@ -37,7 +38,8 @@ class AppBundle extends AbstractBundle {
             appErrorHandlerMiddleware: asClass(AppErrorHandlerMiddleware).inject(() => ({
                 errorMapping: new Map<string, number>([
                     [InvalidArgumentError.name, 400],
-                    [InvalidJsonSchemaError.name, 400]
+                    [InvalidJsonSchemaError.name, 400],
+                    [ModelNotFoundError.name, 404]
                 ])
             }))
         })

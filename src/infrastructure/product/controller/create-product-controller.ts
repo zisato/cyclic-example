@@ -10,7 +10,11 @@ export default class CreateProductController {
     handle = async (req: Request, res: Response): Promise<void> => {
         const requestBody = this.ensureValidRequestBody(req)
 
-        const command = new CreateProductCommand(requestBody.data.id, requestBody.data.attributes.name)
+        const command = new CreateProductCommand(
+          requestBody.data.id,
+          requestBody.data.attributes.name,
+          requestBody.data.relationships.category.id
+        )
         await this.createProduct.execute(command)
 
         res.status(201).send()  
@@ -22,6 +26,11 @@ export default class CreateProductController {
             id: joi.string().uuid().required(),
             attributes: joi.object({
               name: joi.string().required()
+            }).required(),
+            relationships: joi.object({
+              category: joi.object({
+                id: joi.string().required()
+              }).required(),
             }).required(),
           }).required()
         })
