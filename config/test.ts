@@ -9,9 +9,11 @@ const config = {
         path.join(__dirname, '..', 'src', 'application', '**', '*.ts'),
         [
           path.join(__dirname, '..', 'src', 'infrastructure', 'product', 'repository', 'in-memory-product-repository.ts'),
-          {
-            lifetime: Lifetime.SINGLETON
-          }
+          Lifetime.SINGLETON
+        ],
+        [
+          path.join(__dirname, '..', 'src', 'infrastructure', 'category', 'repository', 'in-memory-category-repository.ts'),
+          Lifetime.SINGLETON
         ]
       ]
     }
