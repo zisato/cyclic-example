@@ -62,6 +62,24 @@ export abstract class Kernel {
 
   async preShutdown (): Promise<void> {}
 
+  private loadBundles (): void {
+    this.bundles = []
+    const existingBundleNames: string[] = []
+    const registerBundles: Bundle[] = [
+      new AxilixContainerBundle(),
+      ...this.registerBundles()
+    ]
+    registerBundles.forEach((bundle: Bundle) => {
+      const bundleName = bundle.name()
+      if (existingBundleNames.includes(bundleName)) {
+        throw new BundleNameDuplicatedError(`Trying to load two bundles with same name ${bundleName}`)
+      }
+
+      existingBundleNames.push(bundleName)
+      this.bundles.push(bundle)
+    })
+  }
+
   private async loadConfiguration (): Promise<Configuration> {
     const currentConfiguration = config.util.toObject()
     this.ensureConfigurationExistsInBundles(currentConfiguration)
@@ -126,23 +144,6 @@ export abstract class Kernel {
 
       return { ...acc, [bundle.name()]: { ...bundleConfig } }
     }, {})
-  }
-
-  private loadBundles (): void {
-    const bundles = [
-      new AxilixContainerBundle(),
-      ...this.registerBundles()
-    ]
-    const existingBundleNames: string[] = []
-    bundles.forEach((bundle: Bundle) => {
-      const bundleName = bundle.name()
-      if (existingBundleNames.includes(bundleName)) {
-        throw new BundleNameDuplicatedError(`Trying to load two bundles with same name ${bundleName}`)
-      }
-
-      existingBundleNames.push(bundleName)
-      this.bundles.push(bundle)
-    })
   }
 
   private ensureConfigurationExistsInBundles(configuration: Json): void {

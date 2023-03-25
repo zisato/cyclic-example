@@ -1,11 +1,11 @@
 import { Server } from 'http'
+import { Bundle } from './bundle/bundle'
 import { Configuration } from './container/configuration'
 import { Container } from './container/container'
 import { HttpKernelError } from './exception/http-kernel-error'
 import { Kernel } from './kernel'
 
 export interface HttpServer {
-  boot: () => Promise<void>
   start: (port: number) => Promise<Server>
   stop: () => Promise<void>
 }
@@ -19,17 +19,27 @@ export type PreServerStartMethod = () => Promise<void>
 export abstract class HttpKernel extends Kernel {
   abstract httpServerBundleName (): string
 
-  async startServer (): Promise<Server> {
-    await this.boot()
-    const bundleName = this.httpServerBundleName()
-    const port = this.getPort(bundleName)
-    const server = this.getServer(bundleName)
+  async boot(): Promise<void> {
+    const bundles = this.registerBundles()
 
-    return await server.start(port)
+    const existsHttpServerBundle = bundles.some((bundle: Bundle) => {
+      return bundle.name() === this.httpServerBundleName()
+    })
+
+    if (existsHttpServerBundle === false) {
+      throw new HttpKernelError('HttpServerBundleName not registered as bundle.')
+    }
+
+    await super.boot()
   }
 
-  preServerStart (): Array<Promise<void>> {
-    return []
+  async startServer (): Promise<Server> {
+    await this.boot()
+
+    const port = this.getPort(this.httpServerBundleName())
+    const server = this.getServer(this.httpServerBundleName())
+
+    return await server.start(port)
   }
 
   private getPort (bundleName: string): number {

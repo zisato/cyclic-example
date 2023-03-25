@@ -466,16 +466,22 @@ describe('ExpressServerBundle unit test', () => {
 })
 
 describe('ExpressHttpServer unit test', () => {
+  beforeEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('boot method', () => {
+    const app = {
+      use: jest.fn(),
+      listen: jest.fn()
+    } as unknown as express.Express
+
     test('Should call app.use with middlewares', async () => {
-      const app = {
-        use: jest.fn()
-      } as unknown as express.Express
       const middlewareHandler = (): void => {}
       const middlewares = [middlewareHandler]
       const server = new ExpressHttpServer(app, middlewares, [], [], [])
   
-      await server.boot()
+      await server.start(0)
   
       const expectedTimes = 1
       const expectedArguments = [middlewareHandler]
@@ -484,14 +490,11 @@ describe('ExpressHttpServer unit test', () => {
     })
   
     test('Should call app.use with routes', async () => {
-      const app = {
-        use: jest.fn()
-      } as unknown as express.Express
       const route = {} as IRouter
       const routes = [route]
       const server = new ExpressHttpServer(app, [], [], routes, [])
   
-      await server.boot()
+      await server.start(0)
   
       const expectedTimes = 1
       const expectedArguments = [route]
@@ -500,16 +503,13 @@ describe('ExpressHttpServer unit test', () => {
     })
   
     test('Should call app.use with errorHandlerMiddlewares', async () => {
-      const app = {
-        use: jest.fn()
-      } as unknown as express.Express
       const errorHandlerMiddleware = {
         handle: async (): Promise<void> => {}
       }
       const errorHandlerMiddlewares = [errorHandlerMiddleware]
       const server = new ExpressHttpServer(app, [], errorHandlerMiddlewares, [], [])
   
-      await server.boot()
+      await server.start(0)
   
       const expectedTimes = 1
       const expectedArguments = [errorHandlerMiddleware.handle]
@@ -518,15 +518,12 @@ describe('ExpressHttpServer unit test', () => {
     })
   
     test('Should not call app.use when booted', async () => {
-      const app = {
-        use: jest.fn()
-      } as unknown as express.Express
       const middlewareHandler = (): void => {}
       const middlewares = [middlewareHandler]
       const server = new ExpressHttpServer(app, middlewares, [], [], [])
   
-      await server.boot()
-      await server.boot()
+      await server.start(0)
+      await server.start(0)
   
       const expectedTimes = 1
       expect(app.use).toHaveBeenCalledTimes(expectedTimes)

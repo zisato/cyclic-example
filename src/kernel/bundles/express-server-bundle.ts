@@ -36,6 +36,7 @@ export interface RouteLoader {
 type MiddlewareConfigurationSchema = string | { [key: string]: any }
 
 export class ExpressServerBundle extends AbstractBundle {
+  static readonly bundleName = 'expressServer'
   private readonly routeLoader: RouteLoader
   private readonly preServerStart: PreServerStart
 
@@ -54,7 +55,7 @@ export class ExpressServerBundle extends AbstractBundle {
   }
 
   name (): string {
-    return 'expressServer'
+    return ExpressServerBundle.bundleName
   }
 
   configSchema (): ObjectSchema | null {
@@ -130,7 +131,7 @@ export class ExpressServerBundle extends AbstractBundle {
     }
   }
 
-  private getMiddlewareIds(middlewareConfigurations: Array<string | { [key: string]: unknown }>): string[] {
+  private getMiddlewareIds(middlewareConfigurations: MiddlewareConfigurationSchema[]): string[] {
     return middlewareConfigurations.map((value: string | { [key: string]: unknown }): string => {
       if (typeof value === 'string') {
         return value
@@ -194,7 +195,30 @@ export class ExpressHttpServer implements HttpServer {
     private readonly preServerStart: PreServerStartMethod[]
   ) {}
 
-  boot = async (): Promise<void> => {
+  start = async (port: number): Promise<Server> => {
+    if (this.server !== null) {
+      return this.server
+    }
+
+    await this.boot()
+
+    await this.executePreServerStart()
+
+    this.server = this.app.listen(port)
+
+    return this.server
+  }
+
+  stop = async (): Promise<void> => {
+    if (this.server !== null) {
+      this.server.close()
+      this.server.closeAllConnections()
+
+      this.server = null
+    }
+  }
+
+  private boot = async (): Promise<void> => {
     if (!this.isBooted) {
       this.middlewares.forEach((middleware: RequestHandler) => {
         this.app.use(middleware)
@@ -212,26 +236,11 @@ export class ExpressHttpServer implements HttpServer {
     }
   }
 
-  start = async (port: number): Promise<Server> => {
-    await this.boot()
-
+  private executePreServerStart = async (): Promise<void> => {
     const promises = this.preServerStart.map(async (method: PreServerStartMethod): Promise<void> => {
       return method()
     })
 
     await Promise.all(promises)
-
-    this.server = this.app.listen(port)
-
-    return this.server
-  }
-
-  stop = async (): Promise<void> => {
-    if (this.server !== null) {
-      this.server.close()
-      this.server.closeAllConnections()
-
-      this.server = null
-    }
   }
 }

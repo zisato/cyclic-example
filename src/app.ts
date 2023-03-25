@@ -42,14 +42,14 @@ class AppBundle extends AbstractBundle {
 }
 
 export class App extends HttpKernel {
+    httpServerBundleName(): string {
+        return ExpressServerBundle.bundleName
+    }
+
     registerBundles(): Bundle[] {
         return [
             new AppBundle(),
             new ExpressServerBundle(new AppRouteLoader())
         ]
-    }
-
-    httpServerBundleName (): string {
-      return 'expressServer'
     }
 }

@@ -5,6 +5,7 @@ import { AbstractBundle } from '../../src/kernel/bundle/abstract-bundle'
 import { Bundle } from '../../src/kernel/bundle/bundle'
 import { Configuration } from '../../src/kernel/container/configuration'
 import { HttpKernel, HttpServer } from '../../src/kernel/http-kernel'
+import { HttpKernelError } from '../../src/kernel/exception/http-kernel-error'
 
 class ServerTestBundle extends AbstractBundle {
   name (): string {
@@ -49,12 +50,12 @@ class TestHttpKernel extends HttpKernel {
     super()
   }
 
-  httpServerBundleName(): string {
-    return this.serverBundleName
-  }
-
   registerBundles (): Bundle[] {
     return this.loadedBundles
+  }
+
+  httpServerBundleName(): string {
+    return this.serverBundleName
   }
 }
 
@@ -63,31 +64,28 @@ describe('HttpKernel unit test suite', () => {
     jest.resetAllMocks()
   })
 
-  function givenATestHttpKernel(serverBundleName: string | null = null, bundles: Bundle[] | null = null): TestHttpKernel {
-    serverBundleName = serverBundleName ?? 'serverTestBundle'
-    bundles = bundles ?? [
-      new ServerTestBundle()
-    ]
-
-    return new TestHttpKernel(serverBundleName, bundles)
+  function givenATestHttpKernel(serverBundleName: string, serverTestBundle: Bundle): TestHttpKernel {
+    return new TestHttpKernel(serverBundleName, [serverTestBundle])
   }
 
-  test('Should return empty array as default preServerStart', async () => {
-    const httpKernel = givenATestHttpKernel()
-    const configMock = jest.spyOn(config.util, 'toObject')
-    configMock.mockReturnValueOnce({
-      serverTestBundle: {}
+  describe('boot', () => {
+    test('Should throw error when httpServerBundleName not in registerBundles', async () => {
+      const httpKernel = givenATestHttpKernel('notRegisterBundleName', new ServerTestBundle())
+      const configMock = jest.spyOn(config.util, 'toObject')
+      configMock.mockReturnValueOnce({
+        serverTestBundle: {}
+      })
+
+      const promise = httpKernel.startServer()
+
+      const expectedError = new HttpKernelError('HttpServerBundleName not registered as bundle.')
+      await expect(promise).rejects.toThrowError(expectedError)
     })
-
-    const result = httpKernel.preServerStart()
-
-    const expectedPreServerStart: Promise<void>[] = []
-    expect(result).toEqual(expectedPreServerStart)
   })
 
   describe('startServer', () => {
     test('Should throw error when invalidServerTestBundle.port not exist in configuration', async () => {
-      const httpKernel = givenATestHttpKernel('invalidServerTestBundle', [new InvalidServerTestBundle()])
+      const httpKernel = givenATestHttpKernel('invalidServerTestBundle', new InvalidServerTestBundle())
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
         invalidServerTestBundle: {}
@@ -95,12 +93,12 @@ describe('HttpKernel unit test suite', () => {
 
       const promise = httpKernel.startServer()
 
-      const expectedError = new Error('HttpKernel requires invalidServerTestBundle.port in configuration')
+      const expectedError = new HttpKernelError('HttpKernel requires invalidServerTestBundle.port in configuration')
       await expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should throw error when invalidServerTestBundle.server not exist in container', async () => {
-      const httpKernel = givenATestHttpKernel('invalidServerTestBundle', [new InvalidServerTestBundle()])
+      const httpKernel = givenATestHttpKernel('invalidServerTestBundle', new InvalidServerTestBundle())
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
         invalidServerTestBundle: {
@@ -110,12 +108,12 @@ describe('HttpKernel unit test suite', () => {
 
       const promise = httpKernel.startServer()
 
-      const expectedError = new Error('HttpKernel requires invalidServerTestBundle.server in container')
+      const expectedError = new HttpKernelError('HttpKernel requires invalidServerTestBundle.server in container')
       await expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should load server from container using configured port', async () => {
-      const httpKernel = givenATestHttpKernel()
+      const httpKernel = givenATestHttpKernel('serverTestBundle', new ServerTestBundle())
       const configMock = jest.spyOn(config.util, 'toObject')
       configMock.mockReturnValueOnce({
         serverTestBundle: {
