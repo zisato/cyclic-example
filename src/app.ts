@@ -35,6 +35,7 @@ class AppBundle extends AbstractBundle {
         containerBuilder.register({
             productRepository: aliasTo('inMemoryProductRepository'),
             categoryRepository: aliasTo('inMemoryCategoryRepository'),
+            storeRepository: aliasTo('inMemoryStoreRepository'),
             appErrorHandlerMiddleware: asClass(AppErrorHandlerMiddleware).inject(() => ({
                 errorMapping: new Map<string, number>([
                     [InvalidArgumentError.name, 400],

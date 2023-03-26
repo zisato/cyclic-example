@@ -5,6 +5,8 @@ import { Category } from '../../src/domain/category/category'
 import { CategoryRepository } from '../../src/domain/category/repository/category-repository'
 import { Product } from '../../src/domain/product/product'
 import { ProductRepository } from '../../src/domain/product/repository/product-repository'
+import { StoreRepository } from '../../src/domain/store/repository/store-repository'
+import { Store } from '../../src/domain/store/store'
 
 describe('Product acceptance test', () => {
   const route = '/products'
@@ -42,10 +44,16 @@ describe('Product acceptance test', () => {
     await categoryRepository.save(new Category(id, name))
   }
 
-  async function givenExistingProduct(id: string, categoryId: string): Promise<void> {
+  async function givenExistingStore(id: string, name: string): Promise<void> {
+    const storeRepository = app.getContainer().get<StoreRepository>('storeRepository')
+
+    await storeRepository.save(new Store(id, name))
+  }
+
+  async function givenExistingProduct(id: string, categoryId: string, storeId: string): Promise<void> {
     const productRepository = app.getContainer().get<ProductRepository>('productRepository')
 
-    await productRepository.save(new Product(id, 'product-name', categoryId))
+    await productRepository.save(new Product(id, 'product-name', categoryId, storeId))
   }
 
   test('When not existing category id returns 404 status code', async () => {
@@ -60,9 +68,23 @@ describe('Product acceptance test', () => {
     expect(response.statusCode).toEqual(expectedStatusCode)
   })
 
+  test('When not existing store id returns 404 status code', async () => {
+    // Given
+    await givenExistingCategory('fd8b5e78-cb58-11ed-afa1-0242ac120002', 'category-name')
+    const requestBody = givenValidRequestBody()
+
+    // When
+    const response = await request(server).post(route).send(requestBody)
+
+    // Then
+    const expectedStatusCode = 404
+    expect(response.statusCode).toEqual(expectedStatusCode)
+  })
+
   test('When valid request returns 201 status code', async () => {
     // Given
     await givenExistingCategory('fd8b5e78-cb58-11ed-afa1-0242ac120002', 'category-name')
+    await givenExistingStore('b28c1f6e-cbe1-11ed-afa1-0242ac120002', 'store-name')
     const requestBody = givenValidRequestBody()
 
     // When
@@ -76,7 +98,8 @@ describe('Product acceptance test', () => {
   test('When existing product id returns 400 status code', async () => {
     // Given
     await givenExistingCategory('fd8b5e78-cb58-11ed-afa1-0242ac120002', 'category-name')
-    await givenExistingProduct('1a3e9968-bba5-11ed-afa1-0242ac120002', 'fd8b5e78-cb58-11ed-afa1-0242ac120002')
+    await givenExistingStore('b28c1f6e-cbe1-11ed-afa1-0242ac120002', 'store-name')
+    await givenExistingProduct('1a3e9968-bba5-11ed-afa1-0242ac120002', 'fd8b5e78-cb58-11ed-afa1-0242ac120002', 'b28c1f6e-cbe1-11ed-afa1-0242ac120002')
     const requestBody = givenValidRequestBody()
 
     // When
