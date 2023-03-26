@@ -8,6 +8,7 @@ import { InvalidArgumentError } from "./domain/error/invalid-argument-error";
 import { ModelNotFoundError } from "./domain/error/model-not-found-error";
 import { InvalidJsonSchemaError } from "./infrastructure/error/invalid-json-schema-error";
 import AppErrorHandlerMiddleware from "./infrastructure/express/middleware/app-error-handler-middleware";
+import UserAuthenticatedMiddleware from "./infrastructure/express/middleware/user-authenticated-middleware";
 import { AbstractBundle } from "./kernel/bundle/abstract-bundle";
 import { Bundle } from "./kernel/bundle/bundle";
 import { ExpressServerBundle, RouteLoader } from "./kernel/bundles/express-server-bundle";
@@ -42,7 +43,8 @@ class AppBundle extends AbstractBundle {
                     [InvalidJsonSchemaError.name, 400],
                     [ModelNotFoundError.name, 404]
                 ])
-            }))
+            })),
+            userAuthenticatedMiddleware: asClass(UserAuthenticatedMiddleware)
         })
     }
 }
