@@ -6,6 +6,7 @@ import { InvalidArgumentError } from '../../../../src/domain/error/invalid-argum
 describe('CreateStore unit test suite', () => {
     const stubs = {
         storeRepository: {
+            get: jest.fn(),
             exists: jest.fn(),
             save: jest.fn()
         } as StoreRepository

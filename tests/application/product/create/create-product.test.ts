@@ -17,6 +17,7 @@ describe('CreateProduct unit test suite', () => {
             save: jest.fn()
         } as CategoryRepository,
         storeRepository: {
+            get: jest.fn(),
             exists: jest.fn(),
             save: jest.fn()
         } as StoreRepository

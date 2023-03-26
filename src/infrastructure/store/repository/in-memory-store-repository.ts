@@ -1,8 +1,21 @@
 import { Store } from '../../../domain/store/store'
 import { StoreRepository } from '../../../domain/store/repository/store-repository'
+import { ModelNotFoundError } from '../../../domain/error/model-not-found-error'
 
 export default class InMemoryStoreRepository implements StoreRepository {
     private readonly data: Store[] = []
+
+    async get(id: string): Promise<Store> {
+        const existingStoreIndex = this.data.findIndex((data: Store) => {
+            return data.id === id
+        })
+
+        if (existingStoreIndex === -1) {
+            throw new ModelNotFoundError(`Store with id ${id} not found`)
+        }
+
+        return this.data[existingStoreIndex]
+    }
 
     async exists(id: string): Promise<boolean> {
         return this.data.some((store: Store): boolean => {
