@@ -2,15 +2,19 @@ import { Request, Response } from 'express'
 import CreateProduct from '../../../../src/application/product/create/create-product'
 import CreateProductController from '../../../../src/infrastructure/product/controller/create-product-controller'
 import { InvalidJsonSchemaError } from '../../../../src/infrastructure/error/invalid-json-schema-error'
+import { AuthRequest } from '../../../../src/infrastructure/express/auth-request'
 
 describe('CreateProductController unit test', () => {
   const stubs: {
-    request: Partial<Request>
+    request: Partial<AuthRequest>
     response: Partial<Response>
     createProduct: Partial<CreateProduct>
   } = {
     request: {
-      body: jest.fn()
+      body: jest.fn(),
+      user: {
+        id: 'b28c1f6e-cbe1-11ed-afa1-0242ac120002'
+      }
     },
     response: {
       status: jest.fn().mockImplementation(() => {
@@ -44,6 +48,15 @@ describe('CreateProductController unit test', () => {
     jest.clearAllMocks()
   })
 
+  test('Should throw Error when not user property in auth request', async () => {
+    const request = {} as Partial<AuthRequest>
+
+    const result = controller.handle(request as AuthRequest, stubs.response as Response)
+
+    const expectedError = Error('Not authenticated user')
+    void expect(result).rejects.toThrow(expectedError)
+  })
+
   test('Should call createProduct.execute method when valid request body', async () => {
     // Given
     const id = '1a3e9968-bba5-11ed-afa1-0242ac120002'
@@ -58,7 +71,8 @@ describe('CreateProductController unit test', () => {
     const expected = {
       id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
       name: 'product-name',
-      categoryId: 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+      categoryId: 'fd8b5e78-cb58-11ed-afa1-0242ac120002',
+      storeId: 'b28c1f6e-cbe1-11ed-afa1-0242ac120002'
     }
     expect(stubs.createProduct.execute).toHaveBeenCalledTimes(1)
     expect(stubs.createProduct.execute).toHaveBeenCalledWith(expect.objectContaining(expected))

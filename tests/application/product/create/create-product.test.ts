@@ -4,6 +4,7 @@ import { ProductRepository } from '../../../../src/domain/product/repository/pro
 import { InvalidArgumentError } from '../../../../src/domain/error/invalid-argument-error'
 import { CategoryRepository } from '../../../../src/domain/category/repository/category-repository'
 import { ModelNotFoundError } from '../../../../src/domain/error/model-not-found-error'
+import { StoreRepository } from '../../../../src/domain/store/repository/store-repository'
 
 describe('CreateProduct unit test suite', () => {
     const stubs = {
@@ -14,9 +15,13 @@ describe('CreateProduct unit test suite', () => {
         categoryRepository: {
             exists: jest.fn(),
             save: jest.fn()
-        } as CategoryRepository
+        } as CategoryRepository,
+        storeRepository: {
+            exists: jest.fn(),
+            save: jest.fn()
+        } as StoreRepository
     }
-    const createProduct = new CreateProduct(stubs.productRepository, stubs.categoryRepository)
+    const createProduct = new CreateProduct(stubs.productRepository, stubs.categoryRepository, stubs.storeRepository)
 
     beforeEach(() => {
         jest.resetAllMocks()
@@ -26,8 +31,10 @@ describe('CreateProduct unit test suite', () => {
         const id = 'product-id'
         const name = 'product-name'
         const categoryId = 'category-id'
-        const command = new CreateProductCommand(id, name, categoryId)
+        const storeId = 'store-id'
+        const command = new CreateProductCommand(id, name, categoryId, storeId)
         stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
+        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
         stubs.productRepository.exists = jest.fn().mockResolvedValue(false)
 
         await createProduct.execute(command)
@@ -42,7 +49,8 @@ describe('CreateProduct unit test suite', () => {
         const id = 'product-id'
         const name = 'product-name'
         const categoryId = 'category-id'
-        const command = new CreateProductCommand(id, name, categoryId)
+        const storeId = 'store-id'
+        const command = new CreateProductCommand(id, name, categoryId, storeId)
         stubs.categoryRepository.exists = jest.fn().mockResolvedValue(false)
 
         const promise = createProduct.execute(command)
@@ -51,12 +59,47 @@ describe('CreateProduct unit test suite', () => {
         expect(promise).rejects.toThrowError(expectedError)
     })
 
+    test('Should call storeRepository.exists once with arguments', async () => {
+        const id = 'product-id'
+        const name = 'product-name'
+        const categoryId = 'category-id'
+        const storeId = 'store-id'
+        const command = new CreateProductCommand(id, name, categoryId, storeId)
+        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
+        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
+        stubs.productRepository.exists = jest.fn().mockResolvedValue(false)
+
+        await createProduct.execute(command)
+
+        const expectedTimes = 1
+        const expectedArguments = 'store-id'
+        expect(stubs.storeRepository.exists).toHaveBeenCalledTimes(expectedTimes)
+        expect(stubs.storeRepository.exists).toHaveBeenCalledWith(expectedArguments)
+    })
+
+    test('Should throw error when store id not exists', async () => {
+        const id = 'product-id'
+        const name = 'product-name'
+        const categoryId = 'category-id'
+        const storeId = 'store-id'
+        const command = new CreateProductCommand(id, name, categoryId, storeId)
+        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
+        stubs.storeRepository.exists = jest.fn().mockResolvedValue(false)
+
+        const promise = createProduct.execute(command)
+
+        const expectedError = new ModelNotFoundError('Store with id store-id not found')
+        expect(promise).rejects.toThrowError(expectedError)
+    })
+
     test('Should call productRepository.exists once with arguments', async () => {
         const id = 'product-id'
         const name = 'product-name'
         const categoryId = 'category-id'
-        const command = new CreateProductCommand(id, name, categoryId)
+        const storeId = 'store-id'
+        const command = new CreateProductCommand(id, name, categoryId, storeId)
         stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
+        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
         stubs.productRepository.exists = jest.fn().mockResolvedValue(false)
 
         await createProduct.execute(command)
@@ -71,8 +114,10 @@ describe('CreateProduct unit test suite', () => {
         const id = 'product-id'
         const name = 'product-name'
         const categoryId = 'category-id'
-        const command = new CreateProductCommand(id, name, categoryId)
+        const storeId = 'store-id'
+        const command = new CreateProductCommand(id, name, categoryId, storeId)
         stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
+        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
         stubs.productRepository.exists = jest.fn().mockResolvedValue(true)
 
         const promise = createProduct.execute(command)
@@ -85,8 +130,10 @@ describe('CreateProduct unit test suite', () => {
         const id = 'product-id'
         const name = 'product-name'
         const categoryId = 'category-id'
-        const command = new CreateProductCommand(id, name, categoryId)
+        const storeId = 'store-id'
+        const command = new CreateProductCommand(id, name, categoryId, storeId)
         stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
+        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
         stubs.productRepository.exists = jest.fn().mockResolvedValue(false)
 
         await createProduct.execute(command)

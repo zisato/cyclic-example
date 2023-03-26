@@ -1,3 +1,8 @@
 export class CreateProductCommand {
-    constructor (public readonly id: string, public readonly name: string, public readonly categoryId: string) {}
+    constructor (
+        public readonly id: string,
+        public readonly name: string,
+        public readonly categoryId: string,
+        public readonly storeId: string
+    ) {}
 }
