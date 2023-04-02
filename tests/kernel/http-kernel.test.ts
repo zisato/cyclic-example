@@ -79,7 +79,7 @@ describe('HttpKernel unit test suite', () => {
       const promise = httpKernel.startServer()
 
       const expectedError = new HttpKernelError('HttpServerBundleName not registered as bundle.')
-      await expect(promise).rejects.toThrowError(expectedError)
+      void expect(promise).rejects.toThrowError(expectedError)
     })
   })
 
@@ -94,7 +94,7 @@ describe('HttpKernel unit test suite', () => {
       const promise = httpKernel.startServer()
 
       const expectedError = new HttpKernelError('HttpKernel requires invalidServerTestBundle.port in configuration')
-      await expect(promise).rejects.toThrowError(expectedError)
+      void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should throw error when invalidServerTestBundle.server not exist in container', async () => {
@@ -109,7 +109,7 @@ describe('HttpKernel unit test suite', () => {
       const promise = httpKernel.startServer()
 
       const expectedError = new HttpKernelError('HttpKernel requires invalidServerTestBundle.server in container')
-      await expect(promise).rejects.toThrowError(expectedError)
+      void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should load server from container using configured port', async () => {

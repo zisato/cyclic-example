@@ -21,6 +21,11 @@ module.exports = {
     ],
     errorHandlers: [
       'appErrorHandlerMiddleware'
-    ]
+    ],
+    ejs: {
+      views: [
+        path.join(__dirname, '..', 'src', 'views')
+      ]
+    }
   }
 }

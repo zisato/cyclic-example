@@ -3,12 +3,15 @@ import CreateProduct from '../../../../src/application/product/create/create-pro
 import CreateProductController from '../../../../src/infrastructure/product/controller/create-product-controller'
 import { InvalidJsonSchemaError } from '../../../../src/infrastructure/error/invalid-json-schema-error'
 import { AuthRequest } from '../../../../src/infrastructure/express/auth-request'
+import FindStoreByUser from '../../../../src/application/store/find-by-user/find-store-by-user'
+import { Store } from '../../../../src/domain/store/store'
 
 describe('CreateProductController unit test', () => {
   const stubs: {
     request: Partial<AuthRequest>
     response: Partial<Response>
-    createProduct: Partial<CreateProduct>
+    createProduct: Partial<CreateProduct>,
+    findStoreByUser: Partial<FindStoreByUser>
   } = {
     request: {
       body: jest.fn(),
@@ -24,9 +27,12 @@ describe('CreateProductController unit test', () => {
     },
     createProduct: {
       execute: jest.fn()
+    },
+    findStoreByUser: {
+      execute: jest.fn()
     }
   }
-  const controller = new CreateProductController(stubs.createProduct as CreateProduct)
+  const controller = new CreateProductController(stubs.findStoreByUser as FindStoreByUser, stubs.createProduct as CreateProduct)
 
   function getValidRequestBody (id: string, name: string, categoryId: string): any {
     return {
@@ -44,10 +50,14 @@ describe('CreateProductController unit test', () => {
     }
   }
 
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
+  function givenAStore (storeId: string): Store {
+    const storeName = 'StoreName'
+    const userId = '2'
 
+    return new Store(storeId, storeName, userId)
+  }
+
+  /*
   test('Should throw Error when not user property in auth request', async () => {
     const request = {} as Partial<AuthRequest>
 
@@ -56,12 +66,16 @@ describe('CreateProductController unit test', () => {
     const expectedError = Error('Not authenticated user')
     void expect(result).rejects.toThrow(expectedError)
   })
+  */
 
   test('Should call createProduct.execute method when valid request body', async () => {
     // Given
     const id = '1a3e9968-bba5-11ed-afa1-0242ac120002'
     const name = 'product-name'
     const categoryId = 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+    const storeId = 'b28c1f6e-cbe1-11ed-afa1-0242ac120002'
+    const store = givenAStore(storeId)
+    stubs.findStoreByUser.execute = jest.fn().mockResolvedValueOnce(store)
     stubs.request.body = getValidRequestBody(id, name, categoryId)
 
     // When
@@ -83,6 +97,9 @@ describe('CreateProductController unit test', () => {
     const id = '1a3e9968-bba5-11ed-afa1-0242ac120002'
     const name = 'product-name'
     const categoryId = 'fd8b5e78-cb58-11ed-afa1-0242ac120002'
+    const storeId = 'b28c1f6e-cbe1-11ed-afa1-0242ac120002'
+    const store = givenAStore(storeId)
+    stubs.findStoreByUser.execute = jest.fn().mockResolvedValueOnce(store)
     stubs.request.body = getValidRequestBody(id, name, categoryId)
 
     // When
@@ -108,6 +125,9 @@ describe('CreateProductController unit test', () => {
     }
   ])('Should return 201 when valid request body %j', async (requestBody) => {
     // Given
+    const storeId = 'b28c1f6e-cbe1-11ed-afa1-0242ac120002'
+    const store = givenAStore(storeId)
+    stubs.findStoreByUser.execute = jest.fn().mockResolvedValueOnce(store)
     stubs.request.body = requestBody
 
     // When

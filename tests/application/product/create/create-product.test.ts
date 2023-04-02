@@ -19,14 +19,12 @@ describe('CreateProduct unit test suite', () => {
         storeRepository: {
             get: jest.fn(),
             exists: jest.fn(),
-            save: jest.fn()
+            save: jest.fn(),
+            findByUserId: jest.fn(),
+            find: jest.fn()
         } as StoreRepository
     }
     const createProduct = new CreateProduct(stubs.productRepository, stubs.categoryRepository, stubs.storeRepository)
-
-    beforeEach(() => {
-        jest.resetAllMocks()
-    })
 
     test('Should call categoryRepository.exists once with arguments', async () => {
         const id = 'product-id'
@@ -57,7 +55,7 @@ describe('CreateProduct unit test suite', () => {
         const promise = createProduct.execute(command)
 
         const expectedError = new ModelNotFoundError('Category with id category-id not found')
-        expect(promise).rejects.toThrowError(expectedError)
+        void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should call storeRepository.exists once with arguments', async () => {
@@ -90,7 +88,7 @@ describe('CreateProduct unit test suite', () => {
         const promise = createProduct.execute(command)
 
         const expectedError = new ModelNotFoundError('Store with id store-id not found')
-        expect(promise).rejects.toThrowError(expectedError)
+        void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should call productRepository.exists once with arguments', async () => {
@@ -124,7 +122,7 @@ describe('CreateProduct unit test suite', () => {
         const promise = createProduct.execute(command)
 
         const expectedError = new InvalidArgumentError('Existing Product with id product-id')
-        expect(promise).rejects.toThrowError(expectedError)
+        void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should call productRepository.save once with arguments', async () => {

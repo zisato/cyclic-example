@@ -8,19 +8,18 @@ describe('UpdateStore unit test suite', () => {
         storeRepository: {
             get: jest.fn(),
             exists: jest.fn(),
-            save: jest.fn()
+            save: jest.fn(),
+            findByUserId: jest.fn(),
+            find: jest.fn()
         } as StoreRepository
     }
     const updateStore = new UpdateStore(stubs.storeRepository)
 
-    beforeEach(() => {
-        jest.resetAllMocks()
-    })
-
     test('Should call storeRepository.get once with arguments', async () => {
         const id = 'store-id'
         const name = 'store-name'
-        const store = new Store(id, name)
+        const userId = 'user-id'
+        const store = new Store(id, name, userId)
         const newName = 'new-store-name'
         const command = new UpdateStoreCommand(id, newName)
         stubs.storeRepository.get = jest.fn().mockResolvedValue(store)
@@ -36,7 +35,8 @@ describe('UpdateStore unit test suite', () => {
     test('Should call storeRepository.save once with arguments', async () => {
         const id = 'store-id'
         const name = 'store-name'
-        const store = new Store(id, name)
+        const userId = 'user-id'
+        const store = new Store(id, name, userId)
         const newName = 'new-store-name'
         const command = new UpdateStoreCommand(id, newName)
         stubs.storeRepository.get = jest.fn().mockResolvedValue(store)

@@ -73,7 +73,10 @@ export class ExpressServerBundle extends AbstractBundle {
     return joi.object({
       port: joi.number().default(3000),
       middlewares: joi.array().items(joi.string(), corsSchema, staticSchema).default([]),
-      errorHandlers: joi.array().items(joi.string()).default([])
+      errorHandlers: joi.array().items(joi.string()).default([]),
+      ejs: joi.object({
+        views: joi.array().items(joi.string()).default([]),
+      })
     })
   }
 
@@ -88,8 +91,13 @@ export class ExpressServerBundle extends AbstractBundle {
     const routes = this.resolveRoutes(compiledContainer)
     const preServerStartMethods = this.preServerStart.loadMethods(compiledContainer, bundleConfiguration)
 
+    const app = express()
+
+    app.set('views', bundleConfiguration.get('expressServer.ejs.views'))
+    app.set('view engine', 'ejs')
+
     containerBuilder.register({
-      'expressServer.server': asValue(new ExpressHttpServer(express(), middlewares, errorHandlers, routes, preServerStartMethods))
+      'expressServer.server': asValue(new ExpressHttpServer(app, middlewares, errorHandlers, routes, preServerStartMethods))
     })
   }
 

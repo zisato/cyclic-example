@@ -18,6 +18,10 @@ const config = {
         [
           path.join(__dirname, '..', 'src', 'infrastructure', 'store', 'repository', 'in-memory-store-repository.ts'),
           Lifetime.SINGLETON
+        ],
+        [
+          path.join(__dirname, '..', 'src', 'infrastructure', 'user', 'repository', 'in-memory-user-repository.ts'),
+          Lifetime.SINGLETON
         ]
       ]
     }

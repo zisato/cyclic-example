@@ -85,7 +85,7 @@ describe('Kernel unit test suite', () => {
 
     const promise = kernel.boot()
 
-    await expect(promise).rejects.toThrowError(BundleNameDuplicatedError)
+    void expect(promise).rejects.toThrowError(BundleNameDuplicatedError)
   })
 
   describe('loadConfig', () => {
@@ -104,7 +104,7 @@ describe('Kernel unit test suite', () => {
   
       const promise = kernel.boot()
   
-      await expect(promise).rejects.toThrowError(BundleConfigurationNotExistsError)
+      void expect(promise).rejects.toThrowError(BundleConfigurationNotExistsError)
     })
 
     test('Should load config from bundles', async () => {
@@ -170,7 +170,7 @@ describe('Kernel unit test suite', () => {
 
       const promise = kernel.boot()
 
-      await expect(promise).rejects.toThrowError(BundleConfigurationValidationError)
+      void expect(promise).rejects.toThrowError(BundleConfigurationValidationError)
     })
   })
 

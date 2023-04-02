@@ -4,7 +4,7 @@ import { RouteLoader } from '../../src/kernel/bundles/express-server-bundle'
 import StatusController from '../../src/infrastructure/controller/status-controller'
 
 export class StatusRouteLoader implements RouteLoader {
-    loadRoutes (container: Container): Router[] {
+    loadRoutes(container: Container): Router[] {
         const router = Router()
 
         const statusController = container.getTyped(StatusController)

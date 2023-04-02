@@ -21,4 +21,10 @@ export default class InMemoryProductRepository implements ProductRepository {
             this.data.push(product)
         }
     }
+
+    async findByStoreId(storeId: string): Promise<Product[]> {
+        return this.data.filter((product: Product) => {
+            return product.storeId === storeId
+        })
+    }
 }

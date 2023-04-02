@@ -12,10 +12,6 @@ describe('CreateCategory unit test suite', () => {
     }
     const createCategory = new CreateCategory(stubs.categoryRepository)
 
-    beforeEach(() => {
-        jest.resetAllMocks()
-    })
-
     test('Should call categoryRepository.exists once with arguments', async () => {
         const id = 'category-id'
         const name = 'category-name'
@@ -39,7 +35,7 @@ describe('CreateCategory unit test suite', () => {
         const promise = createCategory.execute(command)
 
         const expectedError = new InvalidArgumentError('Existing Category with id category-id')
-        expect(promise).rejects.toThrowError(expectedError)
+        void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should call categoryRepository.save once with arguments', async () => {

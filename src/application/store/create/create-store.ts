@@ -1,22 +1,14 @@
-import { Store } from "../../../domain/store/store";
-import { StoreRepository } from "../../../domain/store/repository/store-repository";
-import { InvalidArgumentError } from "../../../domain/error/invalid-argument-error";
-import { CreateStoreCommand } from "./create-store-command";
+import { CreateStoreCommand } from './create-store-command'
+import { CreateStoreService } from '../../../domain/store/service/create-store-service'
+import { StoreRepository } from '../../../domain/store/repository/store-repository'
+import { SellerRepository } from '../../../domain/seller/repository/seller-repository'
 
 export default class CreateStore {
-    constructor (private readonly storeRepository: StoreRepository) {}
+    constructor(private readonly storeRepository: StoreRepository, private readonly sellerRepository: SellerRepository) { }
 
-    async execute (command: CreateStoreCommand): Promise<void> {
-        await this.ensureStoreIdNotExists(command.id)
+    async execute(command: CreateStoreCommand): Promise<void> {
+        const service = new CreateStoreService(this.storeRepository, this.sellerRepository)
 
-        const store = new Store(command.id, command.name)
-
-        this.storeRepository.save(store)
-    }
-
-    async ensureStoreIdNotExists(id: string): Promise<void> {
-        if (await this.storeRepository.exists(id)) {
-            throw new InvalidArgumentError(`Existing Store with id ${id}`)
-        }
+        await service.create(command.id, command.name, command.sellerId)
     }
 }

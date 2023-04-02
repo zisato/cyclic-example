@@ -6,8 +6,8 @@ export default class InMemoryStoreRepository implements StoreRepository {
     private readonly data: Store[] = []
 
     async get(id: string): Promise<Store> {
-        const existingStoreIndex = this.data.findIndex((data: Store) => {
-            return data.id === id
+        const existingStoreIndex = this.data.findIndex((store: Store) => {
+            return store.id === id
         })
 
         if (existingStoreIndex === -1) {
@@ -33,5 +33,21 @@ export default class InMemoryStoreRepository implements StoreRepository {
         } else {
             this.data.push(store)
         }
+    }
+
+    async findBySellerId(sellerId: string): Promise<Store> {
+        const existingStoreIndex = this.data.findIndex((store: Store) => {
+            return store.sellerId === sellerId
+        })
+
+        if (existingStoreIndex === -1) {
+            throw new ModelNotFoundError(`Store with sellerId ${sellerId} not found`)
+        }
+
+        return this.data[existingStoreIndex]
+    }
+
+    async find(): Promise<Store[]> {
+        return this.data
     }
 }

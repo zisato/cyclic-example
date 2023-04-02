@@ -10,6 +10,7 @@ const jestConfig: Config = {
   testMatch: [
     '**/tests/**/*.(test|spec).ts'
   ],
+  clearMocks: true,
   coverageDirectory: './coverage/',
   collectCoverageFrom: ['./src/**'],
   coverageReporters: ['text-summary', 'html'],

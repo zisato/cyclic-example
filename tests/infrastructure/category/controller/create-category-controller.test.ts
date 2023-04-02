@@ -35,10 +35,6 @@ describe('CreateCategoryController unit test', () => {
     }
   }
 
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
   test('Should call createCategory.execute method when valid request body', async () => {
     // Given
     const id = '1a3e9968-bba5-11ed-afa1-0242ac120002'

@@ -1,15 +1,15 @@
 export class Store {
-    constructor (private _id: string, private _name: string) {}
+    readonly id
+    readonly name
+    readonly sellerId
 
-    get id (): string {
-        return this._id
+    constructor({ id, name, sellerId }: { id: string, name: string, sellerId: string }) {
+        this.id = id
+        this.name = name
+        this.sellerId = sellerId
     }
 
-    get name (): string {
-        return this._name
-    }
-    
-    set name (newName: string) {
-        this._name = newName
+    changeName(newName: string): Store {
+        return new Store({ ...this, name: newName })
     }
 }
