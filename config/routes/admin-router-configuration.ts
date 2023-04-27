@@ -1,9 +1,9 @@
-import { Container } from '../../../src/simple-kernel/container/container'
+import { Container } from '../../src/simple-kernel/container/container'
 import { Router } from 'express'
-import { CategoryRouteLoader } from './category'
-import { ProductRouteLoader } from './product'
-import { StoreRouteLoader } from './store'
-import { RouterConfiguration } from '../../../src/simple-kernel/configuration/router-configuration'
+import { CategoryRouteLoader } from './admin/category'
+import { ProductRouteLoader } from './admin/product'
+import { StoreRouteLoader } from './admin/store'
+import { RouterConfiguration } from '../../src/simple-kernel/configuration/router-configuration'
 
 export class AdminRouterConfiguration implements RouterConfiguration {
     getRoutersConfiguration(container: Container): Router[] {

@@ -15,13 +15,13 @@ export default class UpdateProductController {
 
     if (req.method === 'POST') {
       const requestBody = this.ensureValidRequestBody(req)
-      await this.updateProduct.execute(new UpdateProductCommand(product.id, requestBody.attributes.name))
+      await this.updateProduct.execute(new UpdateProductCommand(product.id.value, requestBody.attributes.name))
 
       return res.redirect('/admin/products/update')
     }
 
     const productJsonApi = {
-      id: product.id,
+      id: product.id.value,
       attributes: {
         name: product.name
       }

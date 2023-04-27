@@ -1,10 +1,10 @@
-import { Container } from '../../src/simple-kernel/container/container'
+import { Container } from '../../../src/simple-kernel/container/container'
 import { NextFunction, Request, Response, Router } from 'express'
-import { RouterConfiguration } from '../../src/simple-kernel/configuration/router-configuration'
-import AddItemController from '../../src/infrastructure/order/controller/add-item-controller'
-import CustomerAuthenticatedMiddleware from '../../src/infrastructure/express/middleware/customer-authenticated-middleware'
+import { RouterConfiguration } from '../../../src/simple-kernel/configuration/router-configuration'
+import AddItemController from '../../../src/infrastructure/order/controller/add-item-controller'
+import CustomerAuthenticatedMiddleware from '../../../src/infrastructure/express/middleware/customer-authenticated-middleware'
 
-export class CartRouteLoader implements RouterConfiguration {
+export class CartRouterConfiguration implements RouterConfiguration {
     getRoutersConfiguration(container: Container): Router[] {
         const router = Router()
 

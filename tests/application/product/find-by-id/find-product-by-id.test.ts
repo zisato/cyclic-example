@@ -19,7 +19,7 @@ describe('FindProductById unit test suite', () => {
         await findProductById.execute(query)
 
         const expectedTimes = 1
-        const expectedArguments = storeId.value
+        const expectedArguments = storeId
         expect(stubs.productRepository.get).toHaveBeenCalledTimes(expectedTimes)
         expect(stubs.productRepository.get).toHaveBeenCalledWith(expectedArguments)
     })

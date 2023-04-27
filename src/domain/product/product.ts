@@ -1,10 +1,12 @@
-export class Product {
-    readonly id: string
-    readonly name: string
-    readonly categoryId: string
-    readonly storeId: string
+import { Identity } from "../identity/identity"
 
-    constructor({ id, name, categoryId, storeId }: { id: string, name: string, categoryId: string, storeId: string }) {
+export class Product {
+    readonly id: Identity
+    readonly name: string
+    readonly categoryId: Identity
+    readonly storeId: Identity
+
+    constructor({ id, name, categoryId, storeId }: { id: Identity, name: string, categoryId: Identity, storeId: Identity }) {
         this.id = id
         this.name = name
         this.categoryId = categoryId

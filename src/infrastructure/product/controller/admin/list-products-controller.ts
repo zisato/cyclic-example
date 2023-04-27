@@ -13,16 +13,16 @@ export default class ListProductsController {
         const sellerId = this.getSellerId(req)
         const store = await this.getStore(sellerId)
         const storeJsonApi = {
-            id: store.id,
+            id: store.id.value,
             attributes: {
                 name: store.name
             }
         }
 
-        const products = await this.listProducts.execute(new ListProductsQuery(store.id))
+        const products = await this.listProducts.execute(new ListProductsQuery(store.id.value))
         const productsJsonApi = products.map((product: Product) => {
             return {
-                id: product.id,
+                id: product.id.value,
                 attributes: {
                     name: product.name
                 }

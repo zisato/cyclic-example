@@ -1,11 +1,11 @@
-import { Container } from '../../src/simple-kernel/container/container'
+import { Container } from '../../../src/simple-kernel/container/container'
 import { NextFunction, Request, Response, Router } from 'express'
-import IndexController from '../../src/infrastructure/controller/index-controller'
-import StatusController from '../../src/infrastructure/controller/status-controller'
-import DemoController from '../../src/infrastructure/controller/demo-controller'
-import { RouterConfiguration } from '../../src/simple-kernel/configuration/router-configuration'
+import IndexController from '../../../src/infrastructure/controller/index-controller'
+import StatusController from '../../../src/infrastructure/controller/status-controller'
+import DemoController from '../../../src/infrastructure/controller/demo-controller'
+import { RouterConfiguration } from '../../../src/simple-kernel/configuration/router-configuration'
 
-export class PublicRouteLoader implements RouterConfiguration {
+export class CommonRouterConfiguration implements RouterConfiguration {
     getRoutersConfiguration(container: Container): Router[] {
         const router = Router()
 

@@ -6,6 +6,7 @@ import { CategoryRepository } from '../../../../src/domain/category/repository/c
 import { ModelNotFoundError } from '../../../../src/domain/error/model-not-found-error'
 import { StoreRepository } from '../../../../src/domain/store/repository/store-repository'
 import { InterfaceMock } from '../../../helpers/interface-mock'
+import { UuidV1 } from '../../../../src/infrastructure/identity/uuid-v1'
 
 describe('CreateProduct unit test suite', () => {
     const stubs = {
@@ -23,11 +24,11 @@ describe('CreateProduct unit test suite', () => {
     const createProduct = new CreateProduct(stubs.productRepository, stubs.categoryRepository, stubs.storeRepository)
 
     test('Should call categoryRepository.exists once with arguments', async () => {
-        const id = 'product-id'
+        const id = UuidV1.create().value
         const name = 'product-name'
-        const categoryId = 'category-id'
-        const storeId = 'store-id'
-        const command = new CreateProductCommand(id, name, categoryId, storeId)
+        const categoryId = UuidV1.create()
+        const storeId = UuidV1.create().value
+        const command = new CreateProductCommand(id, name, categoryId.value, storeId)
         stubs.categoryRepository.exists.mockResolvedValue(true)
         stubs.storeRepository.exists.mockResolvedValue(true)
         stubs.productRepository.exists.mockResolvedValue(false)
@@ -35,31 +36,31 @@ describe('CreateProduct unit test suite', () => {
         await createProduct.execute(command)
 
         const expectedTimes = 1
-        const expectedArguments = 'category-id'
+        const expectedArguments = categoryId
         expect(stubs.categoryRepository.exists).toHaveBeenCalledTimes(expectedTimes)
         expect(stubs.categoryRepository.exists).toHaveBeenCalledWith(expectedArguments)
     })
 
     test('Should throw error when category id not exists', async () => {
-        const id = 'product-id'
+        const id = UuidV1.create().value
         const name = 'product-name'
-        const categoryId = 'category-id'
-        const storeId = 'store-id'
+        const categoryId = UuidV1.create().value
+        const storeId = UuidV1.create().value
         const command = new CreateProductCommand(id, name, categoryId, storeId)
         stubs.categoryRepository.exists.mockResolvedValue(false)
 
         const promise = createProduct.execute(command)
 
-        const expectedError = new ModelNotFoundError('Category with id category-id not found')
+        const expectedError = new ModelNotFoundError(`Category with id ${categoryId} not found`)
         void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should call storeRepository.exists once with arguments', async () => {
-        const id = 'product-id'
+        const id = UuidV1.create().value
         const name = 'product-name'
-        const categoryId = 'category-id'
-        const storeId = 'store-id'
-        const command = new CreateProductCommand(id, name, categoryId, storeId)
+        const categoryId = UuidV1.create().value
+        const storeId = UuidV1.create()
+        const command = new CreateProductCommand(id, name, categoryId, storeId.value)
         stubs.categoryRepository.exists.mockResolvedValue(true)
         stubs.storeRepository.exists.mockResolvedValue(true)
         stubs.productRepository.exists.mockResolvedValue(false)
@@ -67,32 +68,32 @@ describe('CreateProduct unit test suite', () => {
         await createProduct.execute(command)
 
         const expectedTimes = 1
-        const expectedArguments = 'store-id'
+        const expectedArguments = storeId
         expect(stubs.storeRepository.exists).toHaveBeenCalledTimes(expectedTimes)
         expect(stubs.storeRepository.exists).toHaveBeenCalledWith(expectedArguments)
     })
 
     test('Should throw error when store id not exists', async () => {
-        const id = 'product-id'
+        const id = UuidV1.create().value
         const name = 'product-name'
-        const categoryId = 'category-id'
-        const storeId = 'store-id'
+        const categoryId = UuidV1.create().value
+        const storeId = UuidV1.create().value
         const command = new CreateProductCommand(id, name, categoryId, storeId)
         stubs.categoryRepository.exists.mockResolvedValue(true)
         stubs.storeRepository.exists.mockResolvedValue(false)
 
         const promise = createProduct.execute(command)
 
-        const expectedError = new ModelNotFoundError('Store with id store-id not found')
+        const expectedError = new ModelNotFoundError(`Store with id ${storeId} not found`)
         void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should call productRepository.exists once with arguments', async () => {
-        const id = 'product-id'
+        const id = UuidV1.create()
         const name = 'product-name'
-        const categoryId = 'category-id'
-        const storeId = 'store-id'
-        const command = new CreateProductCommand(id, name, categoryId, storeId)
+        const categoryId = UuidV1.create().value
+        const storeId = UuidV1.create().value
+        const command = new CreateProductCommand(id.value, name, categoryId, storeId)
         stubs.categoryRepository.exists.mockResolvedValue(true)
         stubs.storeRepository.exists.mockResolvedValue(true)
         stubs.productRepository.exists.mockResolvedValue(false)
@@ -100,16 +101,16 @@ describe('CreateProduct unit test suite', () => {
         await createProduct.execute(command)
 
         const expectedTimes = 1
-        const expectedArguments = 'product-id'
+        const expectedArguments = id
         expect(stubs.productRepository.exists).toHaveBeenCalledTimes(expectedTimes)
         expect(stubs.productRepository.exists).toHaveBeenCalledWith(expectedArguments)
     })
 
     test('Should throw error when product id exists', async () => {
-        const id = 'product-id'
+        const id = UuidV1.create().value
         const name = 'product-name'
-        const categoryId = 'category-id'
-        const storeId = 'store-id'
+        const categoryId = UuidV1.create().value
+        const storeId = UuidV1.create().value
         const command = new CreateProductCommand(id, name, categoryId, storeId)
         stubs.categoryRepository.exists.mockResolvedValue(true)
         stubs.storeRepository.exists.mockResolvedValue(true)
@@ -117,16 +118,16 @@ describe('CreateProduct unit test suite', () => {
 
         const promise = createProduct.execute(command)
 
-        const expectedError = new InvalidArgumentError('Existing Product with id product-id')
+        const expectedError = new InvalidArgumentError(`Existing Product with id ${id}`)
         void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should call productRepository.save once with arguments', async () => {
-        const id = 'product-id'
+        const id = UuidV1.create()
         const name = 'product-name'
-        const categoryId = 'category-id'
-        const storeId = 'store-id'
-        const command = new CreateProductCommand(id, name, categoryId, storeId)
+        const categoryId = UuidV1.create().value
+        const storeId = UuidV1.create().value
+        const command = new CreateProductCommand(id.value, name, categoryId, storeId)
         stubs.categoryRepository.exists.mockResolvedValue(true)
         stubs.storeRepository.exists.mockResolvedValue(true)
         stubs.productRepository.exists.mockResolvedValue(false)
@@ -135,7 +136,7 @@ describe('CreateProduct unit test suite', () => {
 
         const expectedTimes = 1
         const expectedArguments = expect.objectContaining({
-            id: 'product-id',
+            id,
             name: 'product-name'
         })
         expect(stubs.productRepository.save).toHaveBeenCalledTimes(expectedTimes)

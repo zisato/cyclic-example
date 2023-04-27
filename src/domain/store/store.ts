@@ -1,9 +1,11 @@
-export class Store {
-    readonly id: string
-    readonly name: string
-    readonly sellerId: string
+import { Identity } from '../identity/identity'
 
-    constructor({ id, name, sellerId }: { id: string, name: string, sellerId: string }) {
+export class Store {
+    readonly id: Identity
+    readonly name: string
+    readonly sellerId: Identity
+
+    constructor({ id, name, sellerId }: { id: Identity, name: string, sellerId: Identity }) {
         this.id = id
         this.name = name
         this.sellerId = sellerId

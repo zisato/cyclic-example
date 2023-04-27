@@ -15,13 +15,13 @@ describe('UpdateProduct unit test suite', () => {
     const updateProduct = new UpdateProduct(stubs.productRepository)
 
     test('Should call productRepository.get once with arguments', async () => {
-        const id = UuidV1.create().value
+        const id = UuidV1.create()
         const name = 'product-name'
-        const categoryId = UuidV1.create().value
-        const storeId = UuidV1.create().value
+        const categoryId = UuidV1.create()
+        const storeId = UuidV1.create()
         const product = new Product({ id, name, categoryId, storeId })
         const newName = 'new-product-name'
-        const command = new UpdateProductCommand(id, newName)
+        const command = new UpdateProductCommand(id.value, newName)
         stubs.productRepository.get.mockResolvedValue(product)
 
         await updateProduct.execute(command)
@@ -33,13 +33,13 @@ describe('UpdateProduct unit test suite', () => {
     })
 
     test('Should call productRepository.save once with arguments', async () => {
-        const id = UuidV1.create().value
+        const id = UuidV1.create()
         const name = 'product-name'
-        const categoryId = UuidV1.create().value
-        const storeId = UuidV1.create().value
+        const categoryId = UuidV1.create()
+        const storeId = UuidV1.create()
         const product = new Product({ id, name, categoryId, storeId })
         const newName = 'new-product-name'
-        const command = new UpdateProductCommand(id, newName)
+        const command = new UpdateProductCommand(id.value, newName)
         stubs.productRepository.get.mockResolvedValue(product)
 
         await updateProduct.execute(command)

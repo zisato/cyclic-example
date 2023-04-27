@@ -1,18 +1,19 @@
 import { Customer } from '../../../domain/customer/customer'
 import { CustomerRepository } from '../../../domain/customer/repository/customer-repository'
+import { Identity } from '../../../domain/identity/identity'
 
 export default class InMemoryCustomerRepository implements CustomerRepository {
     private readonly data: Customer[] = []
 
-    async exists (id: string): Promise<boolean> {
+    async exists (id: Identity): Promise<boolean> {
         return this.data.some((customer: Customer): boolean => {
-            return customer.getId() === id
+            return customer.id.equals(id)
         })
     }
 
     async save (customer: Customer): Promise<void> {
         const existingCustomerIndex = this.data.findIndex((data: Customer) => {
-            return data.getId() === customer.getId()
+            return data.id.equals(customer.id)
         })
 
         if (existingCustomerIndex >= 0) {

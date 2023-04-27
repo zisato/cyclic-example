@@ -12,7 +12,7 @@ export default class ListCategoriesController {
         const categories = await this.listCategories.execute(query)
         const categoriesJsonApi = categories.map((category: Category) => {
             return {
-                id: category.id,
+                id: category.id.value,
                 attributes: {
                     name: category.name
                 }

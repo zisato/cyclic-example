@@ -9,7 +9,9 @@ describe('Status acceptance test', () => {
   const app = new App()
 
   beforeAll(async () => {
-    server = await app.startServer()
+    app.boot()
+    const parameters = app.getParameters()
+    server = await app.startServer(parameters.get<number>('express.port'))
   })
 
   afterAll(async () => {

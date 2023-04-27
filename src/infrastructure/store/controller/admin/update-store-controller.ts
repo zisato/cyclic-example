@@ -16,13 +16,13 @@ export default class UpdateStoreController {
 
         if (req.method === 'POST') {
             const requestBody = this.ensureValidRequestBody(req)
-            await this.updateStore.execute(new UpdateStoreCommand(store.id, requestBody.attributes.name))
+            await this.updateStore.execute(new UpdateStoreCommand(store.id.value, requestBody.attributes.name))
 
             return res.redirect('/admin/stores/update')
         }
 
         const storeJsonApi = {
-            id: store.id,
+            id: store.id.value,
             attributes: {
                 name: store.name
             }

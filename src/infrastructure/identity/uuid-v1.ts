@@ -15,6 +15,10 @@ export class UuidV1 implements Identity {
     return new UuidV1(v1())
   }
 
+  equals(identity: Identity): boolean {
+    return this.value === identity.value
+  }
+
   private assertInvalidValue (id: string): void {
     if (!validate(id)) {
       throw new Error(`Invalid identity value: ${id}`)

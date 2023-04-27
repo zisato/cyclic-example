@@ -1,25 +1,26 @@
 import { ModelNotFoundError } from '../../../domain/error/model-not-found-error'
+import { Identity } from '../../../domain/identity/identity'
 import { Product } from '../../../domain/product/product'
 import { ProductRepository } from '../../../domain/product/repository/product-repository'
 
 export default class InMemoryProductRepository implements ProductRepository {
     private readonly data: Product[] = []
 
-    async get(id: string): Promise<Product> {
+    async get(id: Identity): Promise<Product> {
         const existingProductIndex = this.data.findIndex((product: Product) => {
-            return product.id === id
+            return product.id.equals(id)
         })
 
         if (existingProductIndex === -1) {
-            throw new ModelNotFoundError(`Product with id ${id} not found`)
+            throw new ModelNotFoundError(`Product with id ${id.value} not found`)
         }
 
         return this.data[existingProductIndex]
     }
 
-    async exists(id: string): Promise<boolean> {
+    async exists(id: Identity): Promise<boolean> {
         return this.data.some((product: Product): boolean => {
-            return product.id === id
+            return product.id.equals(id)
         })
     }
 
@@ -35,9 +36,9 @@ export default class InMemoryProductRepository implements ProductRepository {
         }
     }
 
-    async findByStoreId(storeId: string): Promise<Product[]> {
+    async findByStoreId(storeId: Identity): Promise<Product[]> {
         return this.data.filter((product: Product) => {
-            return product.storeId === storeId
+            return product.storeId.equals(storeId)
         })
     }
 }

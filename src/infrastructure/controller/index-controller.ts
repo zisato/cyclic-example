@@ -12,7 +12,7 @@ export default class IndexController {
         const stores = await this.listStore.execute(query)
         const storesJsonApi = stores.map((store: Store) => {
             return {
-                id: store.id,
+                id: store.id.value,
                 attributes: {
                     name: store.name
                 }

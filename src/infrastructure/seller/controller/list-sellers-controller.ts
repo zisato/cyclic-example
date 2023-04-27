@@ -12,7 +12,7 @@ export default class ListSellersController {
         const stores = await this.listSellers.execute(query)
         const storesJsonApi = stores.map((seller: Seller) => {
             return {
-                id: seller.id,
+                id: seller.id.value,
                 attributes: {
                     name: seller.name
                 }

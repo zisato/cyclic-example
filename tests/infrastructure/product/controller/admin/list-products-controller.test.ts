@@ -42,9 +42,9 @@ describe('ListProductsController unit test', () => {
 
   test('Should call findStoreBySellerId.execute method when valid request body', async () => {
     // Given
-    const sellerId = CreateDemo.FIXTURES.seller.id
-    const store = new Store({ id: UuidV1.create().value, name: 'store-name', sellerId: sellerId })
-    stubs.request.user = { id: sellerId }
+    const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
+    const store = new Store({ id: UuidV1.create(), name: 'store-name', sellerId: sellerId })
+    stubs.request.user = { id: sellerId.value }
     stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue([])
 
@@ -52,17 +52,17 @@ describe('ListProductsController unit test', () => {
     await controller.handle(stubs.request as Request, stubs.response as Response)
 
     // Then
-    const expected = new FindStoreBySellerIdQuery(sellerId)
+    const expected = new FindStoreBySellerIdQuery(sellerId.value)
     expect(stubs.findStoreBySellerId.execute).toHaveBeenCalledTimes(1)
     expect(stubs.findStoreBySellerId.execute).toHaveBeenCalledWith(expected)
   })
 
   test('Should call listProducts.execute method when valid request body', async () => {
     // Given
-    const sellerId = CreateDemo.FIXTURES.seller.id
-    const storeId = CreateDemo.FIXTURES.seller.id
-    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create().value })
-    stubs.request.user = { id: sellerId }
+    const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
+    const storeId = new UuidV1(CreateDemo.FIXTURES.seller.id)
+    const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
+    stubs.request.user = { id: sellerId.value }
     stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue([])
 
@@ -70,16 +70,16 @@ describe('ListProductsController unit test', () => {
     await controller.handle(stubs.request as Request, stubs.response as Response)
 
     // Then
-    const expected = new ListProductsQuery(storeId)
+    const expected = new ListProductsQuery(storeId.value)
     expect(stubs.listProducts.execute).toHaveBeenCalledTimes(1)
     expect(stubs.listProducts.execute).toHaveBeenCalledWith(expected)
   })
 
   test('Should call res.status method when valid request body', async () => {
     // Given
-    const sellerId = CreateDemo.FIXTURES.seller.id
-    const store = new Store({ id: UuidV1.create().value, name: 'store-name', sellerId: UuidV1.create().value })
-    stubs.request.user = { id: sellerId }
+    const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
+    const store = new Store({ id: UuidV1.create(), name: 'store-name', sellerId: sellerId })
+    stubs.request.user = { id: sellerId.value }
     stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue([])
 
@@ -95,15 +95,15 @@ describe('ListProductsController unit test', () => {
 
   test('Should call res.render method when valid request body', async () => {
     // Given
-    const sellerId = CreateDemo.FIXTURES.seller.id
-    const productId = UuidV1.create().value
-    const categoryId = UuidV1.create().value
-    const storeId = UuidV1.create().value
-    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create().value })
+    const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
+    const productId = UuidV1.create()
+    const categoryId = UuidV1.create()
+    const storeId = UuidV1.create()
+    const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
     const products = [
       new Product({ id: productId, name: 'product-name', categoryId: categoryId, storeId: storeId })
     ]
-    stubs.request.user = { id: sellerId }
+    stubs.request.user = { id: sellerId.value }
     stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue(products)
 
@@ -116,14 +116,14 @@ describe('ListProductsController unit test', () => {
       'admin/product/list',
       {
         store: {
-          id: storeId,
+          id: storeId.value,
           attributes: {
             name: 'store-name'
           }
         },
         products: [
           {
-            id: productId,
+            id: productId.value,
             attributes: {
               name: 'product-name'
             }

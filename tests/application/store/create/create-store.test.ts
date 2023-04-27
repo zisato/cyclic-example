@@ -5,6 +5,7 @@ import { InvalidArgumentError } from '../../../../src/domain/error/invalid-argum
 import { SellerRepository } from '../../../../src/domain/seller/repository/seller-repository'
 import { ModelNotFoundError } from '../../../../src/domain/error/model-not-found-error'
 import { InterfaceMock } from '../../../helpers/interface-mock'
+import { UuidV1 } from '../../../../src/infrastructure/identity/uuid-v1'
 
 describe('CreateStore unit test suite', () => {
     const stubs = {
@@ -19,69 +20,69 @@ describe('CreateStore unit test suite', () => {
     const createStore = new CreateStore(stubs.storeRepository, stubs.sellerRepository)
 
     test('Should call storeRepository.exists once with arguments', async () => {
-        const id = 'store-id'
+        const id = UuidV1.create()
         const name = 'store-name'
-        const userId = 'user-id'
-        const command = new CreateStoreCommand(id, name, userId)
+        const sellerId = UuidV1.create()
+        const command = new CreateStoreCommand(id.value, name, sellerId.value)
         stubs.storeRepository.exists.mockResolvedValueOnce(false)
         stubs.sellerRepository.exists.mockResolvedValueOnce(true)
 
         await createStore.execute(command)
 
         const expectedTimes = 1
-        const expectedArguments = 'store-id'
+        const expectedArguments = id
         expect(stubs.storeRepository.exists).toHaveBeenCalledTimes(expectedTimes)
         expect(stubs.storeRepository.exists).toHaveBeenCalledWith(expectedArguments)
     })
 
     test('Should throw error when store id exists', async () => {
-        const id = 'store-id'
+        const id = UuidV1.create().value
         const name = 'store-name'
-        const userId = 'user-id'
-        const command = new CreateStoreCommand(id, name, userId)
+        const sellerId = UuidV1.create().value
+        const command = new CreateStoreCommand(id, name, sellerId)
         stubs.storeRepository.exists.mockResolvedValueOnce(true)
 
         const promise = createStore.execute(command)
 
-        const expectedError = new InvalidArgumentError('Existing Store with id store-id')
+        const expectedError = new InvalidArgumentError(`Existing Store with id ${id}`)
         void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should call userRepository.exists once with arguments', async () => {
-        const id = 'store-id'
+        const id = UuidV1.create().value
         const name = 'store-name'
-        const userId = 'user-id'
-        const command = new CreateStoreCommand(id, name, userId)
+        const sellerId = UuidV1.create()
+        const command = new CreateStoreCommand(id, name, sellerId.value)
         stubs.storeRepository.exists.mockResolvedValueOnce(false)
         stubs.sellerRepository.exists.mockResolvedValueOnce(true)
 
         await createStore.execute(command)
 
         const expectedTimes = 1
-        const expectedArguments = 'user-id'
+        const expectedArguments = sellerId
         expect(stubs.sellerRepository.exists).toHaveBeenCalledTimes(expectedTimes)
         expect(stubs.sellerRepository.exists).toHaveBeenCalledWith(expectedArguments)
     })
 
     test('Should throw error when user id not exists', async () => {
-        const id = 'store-id'
+        const id = UuidV1.create().value
         const name = 'store-name'
-        const userId = 'user-id'
-        const command = new CreateStoreCommand(id, name, userId)
+        const sellerId = UuidV1.create().value
+        const command = new CreateStoreCommand(id, name, sellerId)
         stubs.storeRepository.exists.mockResolvedValueOnce(false)
         stubs.sellerRepository.exists.mockResolvedValueOnce(false)
 
         const promise = createStore.execute(command)
 
-        const expectedError = new ModelNotFoundError('Seller with id user-id not found')
+        const expectedError = new ModelNotFoundError(`Seller with id ${sellerId} not found`)
         void expect(promise).rejects.toThrowError(expectedError)
     })
 
     test('Should call storeRepository.save once with arguments', async () => {
-        const id = 'store-id'
+        const id = UuidV1.create()
         const name = 'store-name'
-        const userId = 'user-id'
-        const command = new CreateStoreCommand(id, name, userId)
+        const sellerId = UuidV1.create().value
+        const command = new CreateStoreCommand(id.value, name, sellerId)
         stubs.storeRepository.exists.mockResolvedValueOnce(false)
         stubs.sellerRepository.exists.mockResolvedValueOnce(true)
 
@@ -89,7 +90,7 @@ describe('CreateStore unit test suite', () => {
 
         const expectedTimes = 1
         const expectedArguments = expect.objectContaining({
-            id: 'store-id',
+            id,
             name: 'store-name'
         })
         expect(stubs.storeRepository.save).toHaveBeenCalledTimes(expectedTimes)

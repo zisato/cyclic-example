@@ -9,6 +9,8 @@ import { CreateSellerService } from '../../../domain/seller/service/create-selle
 import { CreateDemoCommand } from './create-demo-command'
 import { CustomerRepository } from '../../../domain/customer/repository/customer-repository'
 import { CreateCustomerService } from '../../../domain/customer/service/create-customer-service'
+import { UuidV1 } from '../../../infrastructure/identity/uuid-v1'
+import { Identity } from '../../../domain/identity/identity'
 
 export default class CreateDemo {
     static readonly FIXTURES = {
@@ -84,46 +86,46 @@ export default class CreateDemo {
     ) {}
 
     async execute (_command: CreateDemoCommand): Promise<void> {
-        await this.createSeller(CreateDemo.FIXTURES.seller.id, CreateDemo.FIXTURES.seller.name)
+        await this.createSeller(new UuidV1(CreateDemo.FIXTURES.seller.id), CreateDemo.FIXTURES.seller.name)
 
-        await this.createStore(CreateDemo.FIXTURES.store.id, CreateDemo.FIXTURES.store.name, CreateDemo.FIXTURES.store.sellerId)
+        await this.createStore(new UuidV1(CreateDemo.FIXTURES.store.id), CreateDemo.FIXTURES.store.name, new UuidV1(CreateDemo.FIXTURES.store.sellerId))
 
-        await this.createCustomer(CreateDemo.FIXTURES.customer.id, CreateDemo.FIXTURES.customer.name)
+        await this.createCustomer(new UuidV1(CreateDemo.FIXTURES.customer.id), CreateDemo.FIXTURES.customer.name)
 
         for (const category of CreateDemo.FIXTURES.categories) {
-            await this.createCategory(category.id, category.name)
+            await this.createCategory(new UuidV1(category.id), category.name)
         }
 
         for (const product of CreateDemo.FIXTURES.products) {
-            await this.createProduct(product.id, product.name, product.categoryId, CreateDemo.FIXTURES.store.id)
+            await this.createProduct(new UuidV1(product.id), product.name, new UuidV1(product.categoryId), new UuidV1(CreateDemo.FIXTURES.store.id))
         }
     }
 
-    private async createSeller(sellerId: string, sellerName: string): Promise<void> {
+    private async createSeller(sellerId: Identity, sellerName: string): Promise<void> {
         const service = new CreateSellerService(this.sellerRepository)
 
         await service.create(sellerId, sellerName)
     }
 
-    private async createStore(storeId: string, storeName: string, sellerId: string): Promise<void> {
+    private async createStore(storeId: Identity, storeName: string, sellerId: Identity): Promise<void> {
         const service = new CreateStoreService(this.storeRepository, this.sellerRepository)
 
         await service.create(storeId, storeName, sellerId)
     }
 
-    private async createCustomer(customerId: string, customerName: string): Promise<void> {
+    private async createCustomer(customerId: Identity, customerName: string): Promise<void> {
         const service = new CreateCustomerService(this.customerRepository)
 
         await service.create(customerId, customerName)
     }
 
-    private async createCategory(categoryId: string, categoryName: string): Promise<void> {
+    private async createCategory(categoryId: Identity, categoryName: string): Promise<void> {
         const service = new CreateCategoryService(this.categoryRepository)
 
         await service.create(categoryId, categoryName)
     }
 
-    private async createProduct(productId: string, productName: string, categoryId: string, storeId: string): Promise<void> {
+    private async createProduct(productId: Identity, productName: string, categoryId: Identity, storeId: Identity): Promise<void> {
         const service = new CreateProductService(this.productRepository, this.categoryRepository, this.storeRepository)
 
         await service.create(productId, productName, categoryId, storeId)

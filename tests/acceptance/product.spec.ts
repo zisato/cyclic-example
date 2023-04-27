@@ -8,22 +8,28 @@ import { Product } from '../../src/domain/product/product'
 import { ProductRepository } from '../../src/domain/product/repository/product-repository'
 import { StoreRepository } from '../../src/domain/store/repository/store-repository'
 import { Store } from '../../src/domain/store/store'
-import { UserRepository } from '../../src/domain/user/repository/user-repository'
-import { User } from '../../src/domain/user/user'
+import { UuidV1 } from '../../src/infrastructure/identity/uuid-v1'
+import { Seller } from '../../src/domain/seller/seller'
+import { SellerRepository } from '../../src/domain/seller/repository/seller-repository'
 
 describe('Product acceptance test', () => {
-  const route = '/products'
   let server: Server | null = null
   const app = new App()
 
   beforeAll(async () => {
-    server = await app.startServer()
+    app.boot()
+    const parameters = app.getParameters()
+    server = await app.startServer(parameters.get<number>('express.port'))
   })
 
   afterAll(async () => {
     await app.shutdown()
     server = null
   })
+
+  function givenRoute(storeId: string): string {
+    return `/stores/${storeId}/products`
+  }
 
   function givenValidRequestBody(): any {
     return {
@@ -41,34 +47,35 @@ describe('Product acceptance test', () => {
     }
   }
 
-  async function givenExistingUser(id: string, name: string): Promise<void> {
-    const userRepository = app.getContainer().get<UserRepository>('userRepository')
+  async function givenExistingSeller(id: string, name: string): Promise<void> {
+    const sellerRepository = app.getContainer().get<SellerRepository>('sellerRepository')
 
-    await userRepository.save(new User(id, name))
+    await sellerRepository.save(new Seller({ id: new UuidV1(id), name }))
   }
 
   async function givenExistingCategory(id: string, name: string): Promise<void> {
     const categoryRepository = app.getContainer().get<CategoryRepository>('categoryRepository')
 
-    await categoryRepository.save(new Category(id, name))
+    await categoryRepository.save(new Category({ id: new UuidV1(id), name }))
   }
 
-  async function givenExistingStore(id: string, name: string, userId: string): Promise<void> {
+  async function givenExistingStore(id: string, name: string, sellerId: string): Promise<void> {
     const storeRepository = app.getContainer().get<StoreRepository>('storeRepository')
 
-    await storeRepository.save(new Store(id, name, userId))
+    await storeRepository.save(new Store({ id: new UuidV1(id), name, sellerId: new UuidV1(sellerId) }))
   }
 
   async function givenExistingProduct(id: string, categoryId: string, storeId: string): Promise<void> {
     const productRepository = app.getContainer().get<ProductRepository>('productRepository')
 
-    await productRepository.save(new Product(id, 'product-name', categoryId, storeId))
+    await productRepository.save(new Product({ id: new UuidV1(id), name: 'product-name', categoryId: new UuidV1(categoryId), storeId: new UuidV1(storeId) }))
   }
 
   test('When not existing category id returns 404 status code', async () => {
     // Given
-    await givenExistingUser(CreateDemo.FIXTURES.user.id, 'user-name')
-    await givenExistingStore(CreateDemo.FIXTURES.store.id, 'store-name', CreateDemo.FIXTURES.user.id)
+    await givenExistingSeller(CreateDemo.FIXTURES.seller.id, 'seller-name')
+    await givenExistingStore(CreateDemo.FIXTURES.store.id, 'store-name', CreateDemo.FIXTURES.seller.id)
+    const route = givenRoute(CreateDemo.FIXTURES.store.id)
     const requestBody = givenValidRequestBody()
 
     // When
@@ -81,6 +88,7 @@ describe('Product acceptance test', () => {
 
   test('When not existing store id returns 404 status code', async () => {
     // Given
+    const route = givenRoute(CreateDemo.FIXTURES.store.id)
     const requestBody = givenValidRequestBody()
 
     // When
@@ -93,7 +101,8 @@ describe('Product acceptance test', () => {
 
   test('When valid request returns 201 status code', async () => {
     // Given
-    await givenExistingStore(CreateDemo.FIXTURES.store.id, 'store-name', CreateDemo.FIXTURES.user.id)
+    const route = givenRoute(CreateDemo.FIXTURES.store.id)
+    await givenExistingStore(CreateDemo.FIXTURES.store.id, 'store-name', CreateDemo.FIXTURES.seller.id)
     await givenExistingCategory(CreateDemo.FIXTURES.categories[0].id, 'category-name')
     const requestBody = givenValidRequestBody()
 
@@ -107,8 +116,9 @@ describe('Product acceptance test', () => {
 
   test('When existing product id returns 400 status code', async () => {
     // Given
-    await givenExistingUser(CreateDemo.FIXTURES.user.id, 'user-name')
-    await givenExistingStore(CreateDemo.FIXTURES.store.id, 'store-name', CreateDemo.FIXTURES.user.id)
+    const route = givenRoute(CreateDemo.FIXTURES.store.id)
+    await givenExistingSeller(CreateDemo.FIXTURES.seller.id, 'seller-name')
+    await givenExistingStore(CreateDemo.FIXTURES.store.id, 'store-name', CreateDemo.FIXTURES.seller.id)
     await givenExistingCategory(CreateDemo.FIXTURES.categories[0].id, 'category-name')
     await givenExistingProduct(CreateDemo.FIXTURES.products[0].id, CreateDemo.FIXTURES.categories[0].id, CreateDemo.FIXTURES.store.id)
     const requestBody = givenValidRequestBody()

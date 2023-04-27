@@ -1,3 +1,10 @@
+import { Identity } from '../../../domain/identity/identity'
+import { UuidV1 } from '../../../infrastructure/identity/uuid-v1'
+
 export class CreateCategoryCommand {
-    constructor (public readonly id: string, public readonly name: string) {}
+    readonly categoryId: Identity
+
+    constructor (categoryId: string, public readonly name: string) {
+        this.categoryId = new UuidV1(categoryId)
+    }
 }

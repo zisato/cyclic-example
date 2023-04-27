@@ -10,10 +10,9 @@ export default class AddItemController {
     handle = async (req: Request, res: Response): Promise<void> => {
         const customerId = this.getCustomerId(req)
         const requestBody = this.ensureValidRequestBody(req)
-        const command = new AddItemToOrderCommand(customerId, req.body.attributes.product.id, req.body.attributes.product.quantity)
+        const command = new AddItemToOrderCommand(customerId, requestBody.attributes.product.id, requestBody.attributes.product.quantity)
         await this.addItemToOrder.execute(command)
 
-        console.log(customerId, requestBody)
         return res.redirect('/')
     }
 

@@ -1,5 +1,6 @@
 import { Seller } from '../../../domain/seller/seller'
 import { SellerRepository } from '../../../domain/seller/repository/seller-repository'
+import { Identity } from '../../../domain/identity/identity'
 
 export default class InMemorySellerRepository implements SellerRepository {
     private readonly data: Seller[] = []
@@ -8,15 +9,15 @@ export default class InMemorySellerRepository implements SellerRepository {
         return this.data
     }
 
-    async exists (id: string): Promise<boolean> {
+    async exists (id: Identity): Promise<boolean> {
         return this.data.some((seller: Seller): boolean => {
-            return seller.id  === id
+            return seller.id.equals(id)
         })
     }
 
     async save (seller: Seller): Promise<void> {
         const existingSellerIndex = this.data.findIndex((data: Seller) => {
-            return data.id === seller.id
+            return data.id.equals(seller.id)
         })
 
         if (existingSellerIndex >= 0) {

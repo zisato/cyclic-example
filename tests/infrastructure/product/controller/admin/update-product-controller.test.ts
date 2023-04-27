@@ -50,12 +50,12 @@ describe('UpdateProductController unit test', () => {
     test('Should call findProductById.execute method when valid request body', async () => {
       // Given
       const name = 'new-product-name'
-      const productId = UuidV1.create().value
-      const categoryId = UuidV1.create().value
-      const storeId = UuidV1.create().value
+      const productId = UuidV1.create()
+      const categoryId = UuidV1.create()
+      const storeId = UuidV1.create()
       const product = new Product({ id: productId, name: 'product-name', categoryId, storeId })
       stubs.request.method = 'GET'
-      stubs.request.params = { productId: productId }
+      stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
 
@@ -64,7 +64,7 @@ describe('UpdateProductController unit test', () => {
 
       // Then
       const expectedTimes = 1
-      const expectedArguments = new FindProductByIdQuery(productId)
+      const expectedArguments = new FindProductByIdQuery(productId.value)
       expect(stubs.findProductById.execute).toHaveBeenCalledTimes(expectedTimes)
       expect(stubs.findProductById.execute).toHaveBeenCalledWith(expectedArguments)
     })
@@ -72,12 +72,12 @@ describe('UpdateProductController unit test', () => {
     test('Should call res.status method when valid request body', async () => {
       // Given
       const name = 'new-product-name'
-      const productId = UuidV1.create().value
-      const categoryId = UuidV1.create().value
-      const storeId = UuidV1.create().value
+      const productId = UuidV1.create()
+      const categoryId = UuidV1.create()
+      const storeId = UuidV1.create()
       const product = new Product({ id: productId, name: 'product-name', categoryId, storeId })
       stubs.request.method = 'GET'
-      stubs.request.params = { productId: productId }
+      stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
 
@@ -94,12 +94,12 @@ describe('UpdateProductController unit test', () => {
     test('Should call res.render method when valid request body', async () => {
       // Given
       const name = 'new-product-name'
-      const productId = UuidV1.create().value
-      const categoryId = UuidV1.create().value
-      const storeId = UuidV1.create().value
+      const productId = UuidV1.create()
+      const categoryId = UuidV1.create()
+      const storeId = UuidV1.create()
       const product = new Product({ id: productId, name: 'product-name', categoryId, storeId })
       stubs.request.method = 'GET'
-      stubs.request.params = { productId: productId }
+      stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
 
@@ -110,7 +110,7 @@ describe('UpdateProductController unit test', () => {
       const expectedTimes = 1
       const expectedArguments = ['admin/product/update', {
         product: {
-          id: productId,
+          id: productId.value,
           attributes: {
             name: 'product-name'
           }
@@ -125,12 +125,12 @@ describe('UpdateProductController unit test', () => {
     test('Should call updateProduct.execute method when valid request body', async () => {
       // Given
       const name = 'new-product-name'
-      const productId = UuidV1.create().value
-      const categoryId = UuidV1.create().value
-      const storeId = UuidV1.create().value
+      const productId = UuidV1.create()
+      const categoryId = UuidV1.create()
+      const storeId = UuidV1.create()
       const product = new Product({ id: productId, name: 'product-name', categoryId, storeId })
       stubs.request.method = 'POST'
-      stubs.request.params = { productId: productId }
+      stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
 
@@ -149,12 +149,12 @@ describe('UpdateProductController unit test', () => {
     test('Should call res.redirect method when valid request body', async () => {
       // Given
       const name = 'new-product-name'
-      const productId = UuidV1.create().value
-      const categoryId = UuidV1.create().value
-      const storeId = UuidV1.create().value
+      const productId = UuidV1.create()
+      const categoryId = UuidV1.create()
+      const storeId = UuidV1.create()
       const product = new Product({ id: productId, name: 'product-name', categoryId, storeId })
       stubs.request.method = 'POST'
-      stubs.request.params = { productId: productId }
+      stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
 
@@ -176,10 +176,10 @@ describe('UpdateProductController unit test', () => {
       }
     ])('Should throw Error when missing request body parameters %j', async (requestBody) => {
       // Given
-      const productId = UuidV1.create().value
-      const product = new Product({ id: productId, name: 'product-name', categoryId: UuidV1.create().value, storeId: UuidV1.create().value })
+      const productId = UuidV1.create()
+      const product = new Product({ id: productId, name: 'product-name', categoryId: UuidV1.create(), storeId: UuidV1.create() })
       stubs.request.method = 'POST'
-      stubs.request.params = { productId: productId }
+      stubs.request.params = { productId: productId.value }
       stubs.request.body = requestBody
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
 
@@ -209,10 +209,10 @@ describe('UpdateProductController unit test', () => {
       }
     ])('Should throw Error when invalid request body parameters %j', async (requestBody) => {
       // Given
-      const productId = UuidV1.create().value
-      const product = new Product({ id: productId, name: 'product-name', categoryId: UuidV1.create().value, storeId: UuidV1.create().value })
+      const productId = UuidV1.create()
+      const product = new Product({ id: productId, name: 'product-name', categoryId: UuidV1.create(), storeId: UuidV1.create() })
       stubs.request.method = 'POST'
-      stubs.request.params = { productId: productId }
+      stubs.request.params = { productId: productId.value }
       stubs.request.body = requestBody
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
 

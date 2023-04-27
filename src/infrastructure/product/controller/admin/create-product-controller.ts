@@ -9,6 +9,7 @@ import { UuidV1 } from '../../../identity/uuid-v1'
 import ListCategories from '../../../../application/category/list/list-categories'
 import { ListCategoriesQuery } from '../../../../application/category/list/list-categories-query'
 import { Category } from '../../../../domain/category/category'
+import { Identity } from '../../../../domain/identity/identity'
 
 export default class CreateProductController {
   constructor(
@@ -21,7 +22,7 @@ export default class CreateProductController {
     const sellerId = this.getSellerId(req)
 
     if (req.method === 'POST') {
-      const storeId = await this.getStore(sellerId)
+      const storeId = await this.getStoreId(sellerId)
       req.body.id = UuidV1.create().value
       const requestBody = this.ensureValidRequestBody(req)
 
@@ -29,7 +30,7 @@ export default class CreateProductController {
         requestBody.id,
         requestBody.attributes.name,
         requestBody.relationships.category.id,
-        storeId
+        storeId.value
       )
       await this.createProduct.execute(command)
 
@@ -39,7 +40,7 @@ export default class CreateProductController {
     const categories = await this.listCategories.execute(new ListCategoriesQuery())
     const categoriesJsonApi = categories.map((category: Category) => {
       return {
-        id: category.id,
+        id: category.id.value,
         attributes: {
           name: category.name
         }
@@ -80,7 +81,7 @@ export default class CreateProductController {
     return req.user.id as string
   }
 
-  private async getStore(sellerId: string): Promise<string> {
+  private async getStoreId(sellerId: string): Promise<Identity> {
     const store = await this.findStoreBySellerId.execute(new FindStoreBySellerIdQuery(sellerId))
 
     return store.id

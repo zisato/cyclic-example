@@ -37,9 +37,9 @@ describe('IndexController unit test', () => {
 
   test('Should call res.redirect method when valid request', async () => {
     // Given
-    const storeId = UuidV1.create().value
+    const storeId = UuidV1.create()
     const storeName = 'store-name'
-    const storeSellerId = UuidV1.create().value
+    const storeSellerId = UuidV1.create()
     const stores = [
       new Store({ id: storeId, name: storeName, sellerId: storeSellerId })
     ]
@@ -55,7 +55,7 @@ describe('IndexController unit test', () => {
       {
         stores: [
           {
-            id: storeId,
+            id: storeId.value,
             attributes: {
                 name: 'store-name'
             }

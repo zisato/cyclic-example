@@ -1,9 +1,9 @@
-import { Container } from '../../src/simple-kernel/container/container'
+import { Container } from '../../../src/simple-kernel/container/container'
 import { NextFunction, Request, Response, Router } from 'express'
-import { RouterConfiguration } from '../../src/simple-kernel/configuration/router-configuration'
-import ListStoreController from '../../src/infrastructure/store/controller/list-store-controller'
+import { RouterConfiguration } from '../../../src/simple-kernel/configuration/router-configuration'
+import ListStoreController from '../../../src/infrastructure/store/controller/list-store-controller'
 
-export class StoreRouteLoader implements RouterConfiguration {
+export class StoreRouterConfiguration implements RouterConfiguration {
     getRoutersConfiguration(container: Container): Router[] {
         const router = Router()
 

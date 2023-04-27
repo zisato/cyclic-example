@@ -1,15 +1,11 @@
+import { Identity } from '../identity/identity'
+
 export class Customer {
-    constructor (private id: string, private name: string) {}
+    readonly id: Identity
+    readonly name: string
 
-    getId (): string {
-        return this.id
-    }
-
-    getName (): string {
-        return this.name
-    }
-    
-    setName (newName: string): void {
-        this.name = newName
+    constructor({ id, name }: { id: Identity, name: string }) {
+        this.id = id
+        this.name = name
     }
 }

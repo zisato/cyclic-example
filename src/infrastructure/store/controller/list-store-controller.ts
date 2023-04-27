@@ -14,7 +14,7 @@ export default class ListStoreController {
         const stores = await this.listStore.execute(new ListStoreQuery())
         const storesJsonApi = stores.map((store: Store) => {
             return {
-                id: store.id,
+                id: store.id.value,
                 attributes: {
                     name: store.name
                 }
@@ -23,7 +23,7 @@ export default class ListStoreController {
 
         const order = await this.customerOrderDetail.execute(new CustomerOrderDetailCommand(customerId))
         const orderJsonApi = {
-            id: order.id,
+            id: order.id.value,
             attributes: {
                 items: order.items
             }

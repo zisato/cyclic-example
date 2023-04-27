@@ -9,7 +9,7 @@ export default class CustomerOrderDetail {
     async execute(command: CustomerOrderDetailCommand): Promise<Order> {
         let order = await this.orderRepository.findByCustomerId(command.customerId)
         if (order === undefined) {
-            order = new Order({ id: UuidV1.create().value, customerId: command.customerId })
+            order = new Order({ id: UuidV1.create(), customerId: command.customerId })
 
             await this.orderRepository.save(order)
         }

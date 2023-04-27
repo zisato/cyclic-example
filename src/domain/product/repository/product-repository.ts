@@ -1,8 +1,9 @@
+import { Identity } from '../../identity/identity'
 import { Product } from '../product'
 
 export interface ProductRepository {
-    get: (id: string) => Promise<Product>
-    exists: (id: string) => Promise<boolean>
+    get: (id: Identity) => Promise<Product>
+    exists: (id: Identity) => Promise<boolean>
     save: (product: Product) => Promise<void>
-    findByStoreId: (storeId: string) => Promise<Product[]>
+    findByStoreId: (storeId: Identity) => Promise<Product[]>
 }

@@ -15,16 +15,16 @@ export default class ListProductsController {
 
         const store = await this.findStoreById.execute(new FindStoreByIdQuery(req.params.storeId))
         const storeJsonApi = {
-            id: store.id,
+            id: store.id.value,
             attributes: {
                 name: store.name
             }
         }
 
-        const products = await this.listProducts.execute(new ListProductsQuery(store.id))
+        const products = await this.listProducts.execute(new ListProductsQuery(store.id.value))
         const productsJsonApi = products.map((product: Product) => {
             return {
-                id: product.id,
+                id: product.id.value,
                 attributes: {
                     name: product.name
                 }
@@ -33,13 +33,12 @@ export default class ListProductsController {
 
         const order = await this.customerOrderDetail.execute(new CustomerOrderDetailCommand(customerId))
         const orderJsonApi = {
-            id: order.id,
+            id: order.id.value,
             attributes: {
                 items: order.items
             }
         }
 
-        console.log(orderJsonApi)
         res.status(200).render('product/list', {
             store: storeJsonApi,
             products: productsJsonApi,

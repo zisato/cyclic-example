@@ -3,6 +3,7 @@ import ListCategories from '../../../../../src/application/category/list/list-ca
 import { ListCategoriesQuery } from '../../../../../src/application/category/list/list-categories-query'
 import ListCategoriesController from '../../../../../src/infrastructure/category/controller/admin/list-categories-controller'
 import { Category } from '../../../../../src/domain/category/category'
+import { UuidV1 } from '../../../../../src/infrastructure/identity/uuid-v1'
 
 describe('ListCategoriesController unit test', () => {
   const stubs: {
@@ -59,8 +60,9 @@ describe('ListCategoriesController unit test', () => {
 
   test('Should call res.render method when valid request body', async () => {
     // Given
+    const categoryId = UuidV1.create()
     const categories = [
-      new Category({ id: '1a3e9968-bba5-11ed-afa1-0242ac120002', name: 'category-name'})
+      new Category({ id: categoryId, name: 'category-name'})
     ]
     stubs.listCategories.execute = jest.fn().mockResolvedValue(categories)
 
@@ -74,7 +76,7 @@ describe('ListCategoriesController unit test', () => {
       {
         categories: [
           {
-            id: '1a3e9968-bba5-11ed-afa1-0242ac120002',
+            id: categoryId.value,
             attributes: {
                 name: 'category-name'
             }

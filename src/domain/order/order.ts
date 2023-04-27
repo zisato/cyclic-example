@@ -1,18 +1,19 @@
+import { Identity } from "../identity/identity"
 import { OrderItem } from "./order-item"
 
 export class Order {
-    readonly id: string
-    readonly customerId: string
+    readonly id: Identity
+    readonly customerId: Identity
     readonly items: OrderItem[]
 
-    constructor({ id, customerId, items = [] }: { id: string, customerId: string, items?: OrderItem[] }) {
+    constructor({ id, customerId, items = [] }: { id: Identity, customerId: Identity, items?: OrderItem[] }) {
         this.id = id
         this.customerId = customerId
         this.items = items
     }
 
     addItem(item: OrderItem): Order {
-        const existingItemIndex = this.items.findIndex((i) => i.productId === item.productId)
+        const existingItemIndex = this.items.findIndex((i) => i.productId.equals(item.productId))
         const newItems = this.items
 
         if (existingItemIndex > -1) {

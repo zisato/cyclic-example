@@ -1,7 +1,8 @@
+import { Identity } from '../../identity/identity'
 import { Order } from '../order'
 
 export interface OrderRepository {
-    get: (id: string) => Promise<Order>
+    get: (id: Identity) => Promise<Order>
     save: (order: Order) => Promise<void>
-    findByCustomerId: (customerId: string) => Promise<Order | undefined>
+    findByCustomerId: (customerId: Identity) => Promise<Order | undefined>
 }

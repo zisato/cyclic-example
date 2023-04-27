@@ -3,7 +3,7 @@ import request from 'supertest'
 import { App } from '../../../src/app'
 import { Category } from '../../../src/domain/category/category'
 import { CategoryRepository } from '../../../src/domain/category/repository/category-repository'
-import { Identity } from '../../../src/infrastructure/identity/identity'
+import { UuidV1 } from '../../../src/infrastructure/identity/uuid-v1'
 
 describe('Create Category acceptance test', () => {
   let server: Server | null = null
@@ -11,7 +11,9 @@ describe('Create Category acceptance test', () => {
   const route = '/admin/categories/create'
 
   beforeAll(async () => {
-    server = await app.startServer()
+    app.boot()
+    const parameters = app.getParameters()
+    server = await app.startServer(parameters.get<number>('express.port'))
   })
 
   afterAll(async () => {
@@ -30,7 +32,7 @@ describe('Create Category acceptance test', () => {
   async function givenExistingCategory(id: string): Promise<void> {
     const categoryRepository = app.getContainer().get<CategoryRepository>('categoryRepository')
 
-    await categoryRepository.save(new Category({ id, name: 'category-name' }))
+    await categoryRepository.save(new Category({ id: new UuidV1(id), name: 'category-name' }))
   }
 
   describe('GET method', () => {
@@ -61,7 +63,7 @@ describe('Create Category acceptance test', () => {
       // Given
       await givenExistingCategory('1a3e9968-bba5-11ed-afa1-0242ac120002')
       const requestBody = givenValidRequestBody()
-      jest.spyOn(Identity, 'create').mockReturnValue(new Identity('1a3e9968-bba5-11ed-afa1-0242ac120002'))
+      jest.spyOn(UuidV1, 'create').mockReturnValue(new UuidV1('1a3e9968-bba5-11ed-afa1-0242ac120002'))
   
       // When
       const response = await request(server).post(route).send(requestBody)

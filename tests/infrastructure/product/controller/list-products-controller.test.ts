@@ -7,16 +7,20 @@ import FindStoreById from '../../../../src/application/store/find-by-id/find-sto
 import { UuidV1 } from '../../../../src/infrastructure/identity/uuid-v1'
 import { Store } from '../../../../src/domain/store/store'
 import { FindStoreByIdQuery } from '../../../../src/application/store/find-by-id/find-store-by-id-query'
+import CustomerOrderDetail from '../../../../src/application/order/detail/customer-order-detail'
+import { Order } from '../../../../src/domain/order/order'
 
 describe('ListProductsController unit test', () => {
   const stubs: {
     request: Partial<Request>
     response: Partial<Response>
-    listProducts: Partial<ListProducts>,
+    listProducts: Partial<ListProducts>
     findStoreById: Partial<FindStoreById>
+    customerOrderDetail: Partial<CustomerOrderDetail>
   } = {
     request: {
-      params: {}
+      params: {},
+      user: {}
     },
     response: {
       render: jest.fn().mockImplementation(() => {
@@ -34,52 +38,67 @@ describe('ListProductsController unit test', () => {
     },
     findStoreById: {
       execute: jest.fn()
+    },
+    customerOrderDetail: {
+      execute: jest.fn()
     }
   }
 
-  const controller = new ListProductsController(stubs.listProducts as ListProducts, stubs.findStoreById as FindStoreById)
+  const controller = new ListProductsController(stubs.listProducts as ListProducts, stubs.findStoreById as FindStoreById, stubs.customerOrderDetail as CustomerOrderDetail)
 
   test('Should call findStoreById.execute method when valid request body', async () => {
     // Given
-    const storeId = UuidV1.create().value
-    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create().value })
-    stubs.request.params = { storeId: storeId }
+    const storeId = UuidV1.create()
+    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create() })
+    const customerId = UuidV1.create()
+    const order = new Order({ id: UuidV1.create(), customerId })
+    stubs.request.user = { id: customerId.value }
+    stubs.request.params = { storeId: storeId.value }
     stubs.findStoreById.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue([])
+    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
 
     // Then
-    const expected = new FindStoreByIdQuery(storeId)
+    const expected = new FindStoreByIdQuery(storeId.value)
     expect(stubs.findStoreById.execute).toHaveBeenCalledTimes(1)
     expect(stubs.findStoreById.execute).toHaveBeenCalledWith(expected)
   })
 
   test('Should call listProducts.execute method when valid request body', async () => {
     // Given
-    const storeId = UuidV1.create().value
-    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create().value })
-    stubs.request.params = { storeId: storeId }
+    const storeId = UuidV1.create()
+    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create() })
+    const customerId = UuidV1.create()
+    const order = new Order({ id: UuidV1.create(), customerId })
+    stubs.request.user = { id: customerId.value }
+    stubs.request.params = { storeId: storeId.value }
     stubs.findStoreById.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue([])
+    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
 
     // Then
-    const expected = new ListProductsQuery(storeId)
+    const expected = new ListProductsQuery(storeId.value)
     expect(stubs.listProducts.execute).toHaveBeenCalledTimes(1)
     expect(stubs.listProducts.execute).toHaveBeenCalledWith(expected)
   })
 
   test('Should call res.status method when valid request body', async () => {
     // Given
-    const storeId = UuidV1.create().value
-    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create().value })
-    stubs.request.params = { storeId: storeId }
+    const storeId = UuidV1.create()
+    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create() })
+    const customerId = UuidV1.create()
+    const order = new Order({ id: UuidV1.create(), customerId })
+    stubs.request.user = { id: customerId.value }
+    stubs.request.params = { storeId: storeId.value }
     stubs.findStoreById.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue([])
+    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -93,16 +112,21 @@ describe('ListProductsController unit test', () => {
 
   test('Should call res.render method when valid request body', async () => {
     // Given
-    const storeId = UuidV1.create().value
-    const productId = UuidV1.create().value
-    const categoryId = UuidV1.create().value
-    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create().value })
+    const storeId = UuidV1.create()
+    const productId = UuidV1.create()
+    const categoryId = UuidV1.create()
+    const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create() })
     const products = [
       new Product({ id: productId, name: 'product-name', categoryId: categoryId, storeId: storeId})
     ]
-    stubs.request.params = { storeId: storeId }
+    const orderId = UuidV1.create()
+    const customerId = UuidV1.create()
+    const order = new Order({ id: orderId, customerId })
+    stubs.request.user = { id: customerId.value }
+    stubs.request.params = { storeId: storeId.value }
     stubs.findStoreById.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue(products)
+    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -113,19 +137,25 @@ describe('ListProductsController unit test', () => {
       'product/list',
       {
         store: {
-          id: storeId,
+          id: storeId.value,
           attributes: {
             name: 'store-name'
           }
         },
         products: [
           {
-            id: productId,
+            id: productId.value,
             attributes: {
                 name: 'product-name'
             }
+          }
+        ],
+        order: {
+          id: orderId.value,
+          attributes: {
+            items: []
+          }
         }
-        ]
       }
     ]
     expect(stubs.response.render).toHaveBeenCalledTimes(expectedTimes)

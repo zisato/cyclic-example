@@ -51,11 +51,11 @@ describe('UpdateStoreController unit test', () => {
   describe('GET method', () => {
     test('Should call findStoreBySellerId.execute method when valid request body', async () => {
       // Given
-      const sellerId = CreateDemo.FIXTURES.seller.id
+      const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
       const name = 'new-store-name'
-      const storeId = UuidV1.create().value
+      const storeId = UuidV1.create()
       const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
-      stubs.request.user = { id: sellerId }
+      stubs.request.user = { id: sellerId.value }
       stubs.request.method = 'GET'
       stubs.request.body = getValidRequestBody(name)
       stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)
@@ -65,18 +65,18 @@ describe('UpdateStoreController unit test', () => {
 
       // Then
       const expectedTimes = 1
-      const expectedArguments = new FindStoreBySellerIdQuery(sellerId)
+      const expectedArguments = new FindStoreBySellerIdQuery(sellerId.value)
       expect(stubs.findStoreBySellerId.execute).toHaveBeenCalledTimes(expectedTimes)
       expect(stubs.findStoreBySellerId.execute).toHaveBeenCalledWith(expectedArguments)
     })
 
     test('Should call res.status method when valid request body', async () => {
       // Given
-      const sellerId = CreateDemo.FIXTURES.seller.id
+      const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
       const name = 'new-store-name'
-      const storeId = UuidV1.create().value
+      const storeId = UuidV1.create()
       const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
-      stubs.request.user = { id: sellerId }
+      stubs.request.user = { id: sellerId.value }
       stubs.request.method = 'GET'
       stubs.request.body = getValidRequestBody(name)
       stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)
@@ -93,11 +93,11 @@ describe('UpdateStoreController unit test', () => {
 
     test('Should call res.render method when valid request body', async () => {
       // Given
-      const sellerId = CreateDemo.FIXTURES.seller.id
+      const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
       const name = 'new-store-name'
-      const storeId = UuidV1.create().value
+      const storeId = UuidV1.create()
       const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
-      stubs.request.user = { id: sellerId }
+      stubs.request.user = { id: sellerId.value }
       stubs.request.method = 'GET'
       stubs.request.body = getValidRequestBody(name)
       stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)
@@ -109,7 +109,7 @@ describe('UpdateStoreController unit test', () => {
       const expectedTimes = 1
       const expectedArguments = ['admin/store/update', {
         store: {
-          id: storeId,
+          id: storeId.value,
           attributes: {
             name: 'store-name'
           }
@@ -123,11 +123,11 @@ describe('UpdateStoreController unit test', () => {
   describe('POST method', () => {
     test('Should call updateStore.execute method when valid request body', async () => {
       // Given
-      const sellerId = CreateDemo.FIXTURES.seller.id
+      const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
       const name = 'new-store-name'
-      const storeId = UuidV1.create().value
+      const storeId = UuidV1.create()
       const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
-      stubs.request.user = { id: sellerId }
+      stubs.request.user = { id: sellerId.value }
       stubs.request.method = 'POST'
       stubs.request.body = getValidRequestBody(name)
       stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)
@@ -146,11 +146,11 @@ describe('UpdateStoreController unit test', () => {
 
     test('Should call res.redirect method when valid request body', async () => {
       // Given
-      const sellerId = CreateDemo.FIXTURES.seller.id
+      const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
       const name = 'new-store-name'
-      const storeId = UuidV1.create().value
+      const storeId = UuidV1.create()
       const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
-      stubs.request.user = { id: sellerId }
+      stubs.request.user = { id: sellerId.value }
       stubs.request.method = 'POST'
       stubs.request.body = getValidRequestBody(name)
       stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)
@@ -173,10 +173,10 @@ describe('UpdateStoreController unit test', () => {
       }
     ])('Should throw Error when missing request body parameters %j', async (requestBody) => {
       // Given
-      const sellerId = CreateDemo.FIXTURES.seller.id
-      const storeId = UuidV1.create().value
-      const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create().value })
-      stubs.request.user = { id: sellerId }
+      const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
+      const storeId = UuidV1.create()
+      const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
+      stubs.request.user = { id: sellerId.value }
       stubs.request.method = 'POST'
       stubs.request.body = requestBody
       stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)
@@ -207,10 +207,10 @@ describe('UpdateStoreController unit test', () => {
       }
     ])('Should throw Error when invalid request body parameters %j', async (requestBody) => {
       // Given
-      const sellerId = CreateDemo.FIXTURES.seller.id
-      const storeId = UuidV1.create().value
-      const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create().value })
-      stubs.request.user = { id: sellerId }
+      const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
+      const storeId = UuidV1.create()
+      const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
+      stubs.request.user = { id: sellerId.value }
       stubs.request.method = 'POST'
       stubs.request.body = requestBody
       stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)

@@ -3,15 +3,19 @@ import ListStore from '../../../../src/application/store/list/list-store'
 import { Store } from '../../../../src/domain/store/store'
 import ListStoreController from '../../../../src/infrastructure/store/controller/list-store-controller'
 import { UuidV1 } from '../../../../src/infrastructure/identity/uuid-v1'
+import CustomerOrderDetail from '../../../../src/application/order/detail/customer-order-detail'
+import { Order } from '../../../../src/domain/order/order'
 
 describe('ListStoreController unit test', () => {
   const stubs: {
     request: Partial<Request>
     response: Partial<Response>
     listStore: Partial<ListStore>
+    customerOrderDetail: Partial<CustomerOrderDetail>
   } = {
     request: {
-      body: jest.fn()
+      body: jest.fn(),
+      user: {}
     },
     response: {
       status: jest.fn().mockImplementation(() => {
@@ -23,13 +27,20 @@ describe('ListStoreController unit test', () => {
     },
     listStore: {
       execute: jest.fn()
+    },
+    customerOrderDetail: {
+      execute: jest.fn()
     }
   }
-  const controller = new ListStoreController(stubs.listStore as ListStore)
+  const controller = new ListStoreController(stubs.listStore as ListStore, stubs.customerOrderDetail as CustomerOrderDetail)
 
   test('Should call listStore.execute method when valid request', async () => {
     // Given
+    const customerId = UuidV1.create()
+    const order = new Order({ id: UuidV1.create(), customerId })
+    stubs.request.user = { id: customerId.value }
     stubs.listStore.execute = jest.fn().mockResolvedValueOnce([])
+    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -42,7 +53,11 @@ describe('ListStoreController unit test', () => {
 
   test('Should return 200 when valid request', async () => {
     // Given
+    const customerId = UuidV1.create()
+    const order = new Order({ id: UuidV1.create(), customerId })
+    stubs.request.user = { id: customerId.value }
     stubs.listStore.execute = jest.fn().mockResolvedValueOnce([])
+    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -54,13 +69,18 @@ describe('ListStoreController unit test', () => {
 
   test('Should return JsonApi body when valid request', async () => {
     // Given
-    const storeId = UuidV1.create().value
+    const customerId = UuidV1.create()
+    const orderId = UuidV1.create()
+    const order = new Order({ id: orderId, customerId })
+    const storeId = UuidV1.create()
     const storeName = 'store-name'
-    const storeSellerId = UuidV1.create().value
+    const storeSellerId = UuidV1.create()
     const stores = [
       new Store({ id: storeId, name: storeName, sellerId: storeSellerId })
     ]
+    stubs.request.user = { id: customerId.value }
     stubs.listStore.execute = jest.fn().mockResolvedValueOnce(stores)
+    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -72,12 +92,18 @@ describe('ListStoreController unit test', () => {
       {
         stores: [
           {
-            id: storeId,
+            id: storeId.value,
             attributes: {
-                name: 'store-name'
+              name: 'store-name'
             }
+          }
+        ],
+        order: {
+          id: orderId.value,
+          attributes: {
+            items: []
+          }
         }
-        ]
       }
     ]
     expect(stubs.response.render).toHaveBeenCalledTimes(expectedTimes)

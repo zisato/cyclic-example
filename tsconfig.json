@@ -104,7 +104,7 @@
     "src/**/*.ts",
     "config/routes/*.ts",
     "config/production.js"
-, "config/routes/admin/category.ts"  ],
+, "config/routes/admin/category.ts", "config/routes/public/cart.ts"  ],
   "exclude": [
     "config/!(production).*"
   ]

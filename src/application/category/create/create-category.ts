@@ -8,6 +8,6 @@ export default class CreateCategory {
     async execute (command: CreateCategoryCommand): Promise<void> {
         const service = new CreateCategoryService(this.categoryRepository)
 
-        await service.create(command.id, command.name)
+        await service.create(command.categoryId, command.name)
     }
 }
