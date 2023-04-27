@@ -1,7 +1,7 @@
 export class Store {
-    readonly id
-    readonly name
-    readonly sellerId
+    readonly id: string
+    readonly name: string
+    readonly sellerId: string
 
     constructor({ id, name, sellerId }: { id: string, name: string, sellerId: string }) {
         this.id = id

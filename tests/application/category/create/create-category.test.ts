@@ -2,13 +2,14 @@ import CreateCategory from '../../../../src/application/category/create/create-c
 import { CreateCategoryCommand } from '../../../../src/application/category/create/create-category-command'
 import { CategoryRepository } from '../../../../src/domain/category/repository/category-repository'
 import { InvalidArgumentError } from '../../../../src/domain/error/invalid-argument-error'
+import { InterfaceMock } from '../../../helpers/interface-mock'
 
 describe('CreateCategory unit test suite', () => {
     const stubs = {
         categoryRepository: {
             exists: jest.fn(),
             save: jest.fn()
-        } as CategoryRepository
+        } as InterfaceMock<CategoryRepository>
     }
     const createCategory = new CreateCategory(stubs.categoryRepository)
 
@@ -16,7 +17,7 @@ describe('CreateCategory unit test suite', () => {
         const id = 'category-id'
         const name = 'category-name'
         const command = new CreateCategoryCommand(id, name)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(false)
+        stubs.categoryRepository.exists.mockResolvedValue(false)
 
         await createCategory.execute(command)
 
@@ -30,7 +31,7 @@ describe('CreateCategory unit test suite', () => {
         const id = 'category-id'
         const name = 'category-name'
         const command = new CreateCategoryCommand(id, name)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
+        stubs.categoryRepository.exists.mockResolvedValue(true)
 
         const promise = createCategory.execute(command)
 
@@ -42,7 +43,7 @@ describe('CreateCategory unit test suite', () => {
         const id = 'category-id'
         const name = 'category-name'
         const command = new CreateCategoryCommand(id, name)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(false)
+        stubs.categoryRepository.exists.mockResolvedValue(false)
 
         await createCategory.execute(command)
 

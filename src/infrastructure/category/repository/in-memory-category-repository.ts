@@ -3,6 +3,10 @@ import { CategoryRepository } from '../../../domain/category/repository/category
 
 export default class InMemoryCategoryRepository implements CategoryRepository {
     private readonly data: Category[] = []
+    
+    async find(): Promise<Category[]> {
+        return this.data
+    }
 
     async exists(id: string): Promise<boolean> {
         return this.data.some((category: Category): boolean => {

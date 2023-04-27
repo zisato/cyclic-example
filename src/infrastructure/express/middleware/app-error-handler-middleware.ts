@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
-import { ErrorHandlerMiddleware } from '../../../kernel/bundles/express-server-bundle'
 
-export default class AppErrorHandlerMiddleware implements ErrorHandlerMiddleware {
+export default class AppErrorHandlerMiddleware {
     private static readonly DEFAULT_ERROR_CODE = 500
 
     constructor(private readonly errorMapping: Map<string, number> = new Map<string, number>()) { }
@@ -12,7 +11,7 @@ export default class AppErrorHandlerMiddleware implements ErrorHandlerMiddleware
         res.status(status).json({ message: err.message })
     }
 
-    resolveStatus = (error: Error): number => {
+    private resolveStatus = (error: Error): number => {
         let errorCode = this.errorMapping.get(error.constructor.name)
 
         if (errorCode === undefined) {

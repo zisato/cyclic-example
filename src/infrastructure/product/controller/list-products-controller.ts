@@ -1,18 +1,19 @@
-import * as joi from 'joi'
 import { Request, Response } from 'express'
 import ListProducts from '../../../application/product/list/list-products'
 import { ListProductsQuery } from '../../../application/product/list/list-products-query'
+import { Product } from '../../../domain/product/product'
 import FindStoreById from '../../../application/store/find-by-id/find-store-by-id'
 import { FindStoreByIdQuery } from '../../../application/store/find-by-id/find-store-by-id-query'
-import { Product } from '../../../domain/product/product'
-import { InvalidJsonSchemaError } from '../../error/invalid-json-schema-error'
+import CustomerOrderDetail from '../../../application/order/detail/customer-order-detail'
+import { CustomerOrderDetailCommand } from '../../../application/order/detail/customer-order-detail-command'
 
 export default class ListProductsController {
-    constructor(private readonly listProducts: ListProducts, private readonly findStoreById: FindStoreById) { }
+    constructor(private readonly listProducts: ListProducts, private readonly findStoreById: FindStoreById, private readonly customerOrderDetail: CustomerOrderDetail) { }
 
     handle = async (req: Request, res: Response): Promise<void> => {
-        const requestParams = this.ensureValidRequestParams(req)
-        const store = await this.findStoreById.execute(new FindStoreByIdQuery(requestParams.storeId))
+        const customerId = await this.getCustomerId(req)
+
+        const store = await this.findStoreById.execute(new FindStoreByIdQuery(req.params.storeId))
         const storeJsonApi = {
             id: store.id,
             attributes: {
@@ -20,7 +21,7 @@ export default class ListProductsController {
             }
         }
 
-        const products = await this.listProducts.execute(new ListProductsQuery(requestParams.storeId))
+        const products = await this.listProducts.execute(new ListProductsQuery(store.id))
         const productsJsonApi = products.map((product: Product) => {
             return {
                 id: product.id,
@@ -30,22 +31,27 @@ export default class ListProductsController {
             }
         })
 
-        res.render('product/list', {
+        const order = await this.customerOrderDetail.execute(new CustomerOrderDetailCommand(customerId))
+        const orderJsonApi = {
+            id: order.id,
+            attributes: {
+                items: order.items
+            }
+        }
+
+        console.log(orderJsonApi)
+        res.status(200).render('product/list', {
             store: storeJsonApi,
-            products: productsJsonApi
+            products: productsJsonApi,
+            order: orderJsonApi
         })
     }
 
-    private ensureValidRequestParams(req: Request): any {
-      const schema = joi.object({
-        storeId: joi.string().uuid().required()
-      })
-      const validationResult = schema.validate(req.params)
-  
-      if (validationResult.error != null) {
-        throw new InvalidJsonSchemaError(validationResult.error.message)
-      }
-  
-      return validationResult.value
+    private async getCustomerId(req: Request): Promise<string> {
+        if (req.user === undefined || !('id' in req.user)) {
+            throw new Error('Not authenticated customer')
+        }
+
+        return req.user.id as string
     }
 }

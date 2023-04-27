@@ -12,10 +12,7 @@ describe('DemoController unit test', () => {
       body: jest.fn()
     },
     response: {
-      status: jest.fn().mockImplementation(() => {
-        return stubs.response
-      }),
-      send: jest.fn()
+      redirect: jest.fn()
     },
     createDemo: {
       execute: jest.fn()
@@ -33,20 +30,14 @@ describe('DemoController unit test', () => {
     expect(stubs.createDemo.execute).toHaveBeenCalledWith(expect.objectContaining(expected))
   })
 
-  test('Should call res.send method when valid request', async () => {
+  test('Should call res.redirect method when valid request', async () => {
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
 
     // Then
-    expect(stubs.response.send).toHaveBeenCalledTimes(1)
-  })
-
-  test('Should return 201 when valid request', async () => {
-    // When
-    await controller.handle(stubs.request as Request, stubs.response as Response)
-
-    // Then
-    expect(stubs.response.status).toHaveBeenCalledTimes(1)
-    expect(stubs.response.status).toHaveBeenCalledWith(201)
+    const expectedTimes = 1
+    const expectedArgument = '/'
+    expect(stubs.response.redirect).toHaveBeenCalledTimes(expectedTimes)
+    expect(stubs.response.redirect).toHaveBeenCalledWith(expectedArgument)
   })
 })

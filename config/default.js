@@ -2,30 +2,23 @@ const path = require('path');
 
 module.exports = {
   container: {
+    injectionMode: 'CLASSIC',
     loadModules: {
       patterns: [],
       lifetime: 'SCOPED',
       injectionMode: 'CLASSIC'
     }
   },
-  expressServer: {
+  express: {
     port: process.env.HTTP_PORT,
-    middlewares: [
-      'express.cors',
-      'express.json',
-      {
-        'express.static': {
-          dir: path.join(__dirname, '..', 'public')
-        }
+    middlewares: {
+      static: {
+        dir: path.join(__dirname, '..', 'public')
       }
-    ],
-    errorHandlers: [
-      'appErrorHandlerMiddleware'
-    ],
-    ejs: {
-      views: [
-        path.join(__dirname, '..', 'src', 'views')
-      ]
+    },
+    viewEngine: {
+      views: path.join(__dirname, '..', 'src', 'views/handlebars'),
+      layoutsDir: path.join(__dirname, '..', 'src', 'views/handlebars/layouts')
     }
   }
 }

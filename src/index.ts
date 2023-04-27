@@ -1,5 +1,7 @@
 import { App } from './app'
 
-const app = new App
+const app = new App()
+app.boot()
+const parameters = app.getParameters()
 
-app.startServer()
+app.startServer(parameters.get<number>('express.port'))

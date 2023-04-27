@@ -1,0 +1,39 @@
+<main>
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row">
+                <div class="container d-flex justify-content-end">
+                    <a href="/admin/categories/create" class="btn btn-primary">Create</a>
+                </div>
+                <div class="container d-flex">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each categories}}
+                                <tr>
+                                    <th scope="row">{{@index}}</th>
+                                    <td>{{this.attributes.name}}</td>
+                                </tr>
+                            {{/each}}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="container d-flex justify-content-end">
+                                        Total: {{categories.length}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>

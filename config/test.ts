@@ -20,13 +20,13 @@ const config = {
           Lifetime.SINGLETON
         ],
         [
-          path.join(__dirname, '..', 'src', 'infrastructure', 'user', 'repository', 'in-memory-user-repository.ts'),
+          path.join(__dirname, '..', 'src', 'infrastructure', 'customer', 'repository', 'in-memory-customer-repository.ts'),
           Lifetime.SINGLETON
         ]
       ]
     }
   },
-  expressServer: {
+  express: {
     port: Math.floor(Math.random() * 9000 + 1000),
   }
 }

@@ -5,24 +5,20 @@ import { InvalidArgumentError } from '../../../../src/domain/error/invalid-argum
 import { CategoryRepository } from '../../../../src/domain/category/repository/category-repository'
 import { ModelNotFoundError } from '../../../../src/domain/error/model-not-found-error'
 import { StoreRepository } from '../../../../src/domain/store/repository/store-repository'
+import { InterfaceMock } from '../../../helpers/interface-mock'
 
 describe('CreateProduct unit test suite', () => {
     const stubs = {
         productRepository: {
             exists: jest.fn(),
             save: jest.fn()
-        } as ProductRepository,
+        } as InterfaceMock<ProductRepository>,
         categoryRepository: {
-            exists: jest.fn(),
-            save: jest.fn()
-        } as CategoryRepository,
+            exists: jest.fn()
+        } as InterfaceMock<CategoryRepository>,
         storeRepository: {
-            get: jest.fn(),
-            exists: jest.fn(),
-            save: jest.fn(),
-            findByUserId: jest.fn(),
-            find: jest.fn()
-        } as StoreRepository
+            exists: jest.fn()
+        } as InterfaceMock<StoreRepository>
     }
     const createProduct = new CreateProduct(stubs.productRepository, stubs.categoryRepository, stubs.storeRepository)
 
@@ -32,9 +28,9 @@ describe('CreateProduct unit test suite', () => {
         const categoryId = 'category-id'
         const storeId = 'store-id'
         const command = new CreateProductCommand(id, name, categoryId, storeId)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.productRepository.exists = jest.fn().mockResolvedValue(false)
+        stubs.categoryRepository.exists.mockResolvedValue(true)
+        stubs.storeRepository.exists.mockResolvedValue(true)
+        stubs.productRepository.exists.mockResolvedValue(false)
 
         await createProduct.execute(command)
 
@@ -50,7 +46,7 @@ describe('CreateProduct unit test suite', () => {
         const categoryId = 'category-id'
         const storeId = 'store-id'
         const command = new CreateProductCommand(id, name, categoryId, storeId)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(false)
+        stubs.categoryRepository.exists.mockResolvedValue(false)
 
         const promise = createProduct.execute(command)
 
@@ -64,9 +60,9 @@ describe('CreateProduct unit test suite', () => {
         const categoryId = 'category-id'
         const storeId = 'store-id'
         const command = new CreateProductCommand(id, name, categoryId, storeId)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.productRepository.exists = jest.fn().mockResolvedValue(false)
+        stubs.categoryRepository.exists.mockResolvedValue(true)
+        stubs.storeRepository.exists.mockResolvedValue(true)
+        stubs.productRepository.exists.mockResolvedValue(false)
 
         await createProduct.execute(command)
 
@@ -82,8 +78,8 @@ describe('CreateProduct unit test suite', () => {
         const categoryId = 'category-id'
         const storeId = 'store-id'
         const command = new CreateProductCommand(id, name, categoryId, storeId)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.storeRepository.exists = jest.fn().mockResolvedValue(false)
+        stubs.categoryRepository.exists.mockResolvedValue(true)
+        stubs.storeRepository.exists.mockResolvedValue(false)
 
         const promise = createProduct.execute(command)
 
@@ -97,9 +93,9 @@ describe('CreateProduct unit test suite', () => {
         const categoryId = 'category-id'
         const storeId = 'store-id'
         const command = new CreateProductCommand(id, name, categoryId, storeId)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.productRepository.exists = jest.fn().mockResolvedValue(false)
+        stubs.categoryRepository.exists.mockResolvedValue(true)
+        stubs.storeRepository.exists.mockResolvedValue(true)
+        stubs.productRepository.exists.mockResolvedValue(false)
 
         await createProduct.execute(command)
 
@@ -115,9 +111,9 @@ describe('CreateProduct unit test suite', () => {
         const categoryId = 'category-id'
         const storeId = 'store-id'
         const command = new CreateProductCommand(id, name, categoryId, storeId)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.productRepository.exists = jest.fn().mockResolvedValue(true)
+        stubs.categoryRepository.exists.mockResolvedValue(true)
+        stubs.storeRepository.exists.mockResolvedValue(true)
+        stubs.productRepository.exists.mockResolvedValue(true)
 
         const promise = createProduct.execute(command)
 
@@ -131,9 +127,9 @@ describe('CreateProduct unit test suite', () => {
         const categoryId = 'category-id'
         const storeId = 'store-id'
         const command = new CreateProductCommand(id, name, categoryId, storeId)
-        stubs.categoryRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.storeRepository.exists = jest.fn().mockResolvedValue(true)
-        stubs.productRepository.exists = jest.fn().mockResolvedValue(false)
+        stubs.categoryRepository.exists.mockResolvedValue(true)
+        stubs.storeRepository.exists.mockResolvedValue(true)
+        stubs.productRepository.exists.mockResolvedValue(false)
 
         await createProduct.execute(command)
 

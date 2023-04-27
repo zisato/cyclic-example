@@ -9,6 +9,6 @@ export default class DemoController {
         const command = new CreateDemoCommand()
         await this.createDemo.execute(command)
 
-        res.status(201).send()
+        res.redirect('/')
     }
 }

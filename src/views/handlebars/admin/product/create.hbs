@@ -1,0 +1,25 @@
+<main>
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 justify-content-center">
+            <h4>Create product</h4>
+        </div>
+        <div class="container px-4 px-lg-5 mt-5">
+            <form enctype="application/x-www-form-urlencoded" action="/admin/products/create" method="post" name="product">
+                <div class="mb-3">
+                    <label for="attributes[name]" class="form-label">Name</label>
+                    <input type="text" class="form-control" name="attributes[name]">
+                </div>
+                <div class="mb-3">
+                    <label for="attributes[category]" class="form-label">Category</label>
+                    <select class="form-select" name="relationships[category][id]" aria-label="Select category">
+                        {{#each categories}}
+                            <option value="{{this.id}}">{{this.attributes.name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </section>
+
+</main>

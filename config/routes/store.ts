@@ -1,10 +1,10 @@
-import { Container } from '../../src/kernel/container/container'
+import { Container } from '../../src/simple-kernel/container/container'
 import { NextFunction, Request, Response, Router } from 'express'
-import { RouteLoader } from '../../src/kernel/bundles/express-server-bundle'
+import { RouterConfiguration } from '../../src/simple-kernel/configuration/router-configuration'
 import ListStoreController from '../../src/infrastructure/store/controller/list-store-controller'
 
-export class StoreRouteLoader implements RouteLoader {
-    loadRoutes(container: Container): Router[] {
+export class StoreRouteLoader implements RouterConfiguration {
+    getRoutersConfiguration(container: Container): Router[] {
         const router = Router()
 
         const listStoreController = container.getTyped(ListStoreController)

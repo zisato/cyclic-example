@@ -1,6 +1,6 @@
 export class Category {
-    readonly id
-    readonly name
+    readonly id: string
+    readonly name: string
 
     constructor({ id, name }: { id: string, name: string }) {
         this.id = id

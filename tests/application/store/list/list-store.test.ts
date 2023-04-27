@@ -1,15 +1,13 @@
 import ListStore from '../../../../src/application/store/list/list-store'
 import { ListStoreQuery } from '../../../../src/application/store/list/list-store-query'
+import { StoreRepository } from '../../../../src/domain/store/repository/store-repository'
+import { InterfaceMock } from '../../../helpers/interface-mock'
 
 describe('ListStore unit test suite', () => {
     const stubs = {
         storeRepository: {
-            get: jest.fn(),
-            exists: jest.fn(),
-            save: jest.fn(),
-            findByUserId: jest.fn(),
             find: jest.fn()
-        }
+        } as InterfaceMock<StoreRepository>
     }
     const listStore = new ListStore(stubs.storeRepository)
 

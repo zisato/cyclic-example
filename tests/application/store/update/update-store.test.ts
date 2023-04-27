@@ -2,27 +2,25 @@ import UpdateStore from '../../../../src/application/store/update/update-store'
 import { UpdateStoreCommand } from '../../../../src/application/store/update/update-store-command'
 import { StoreRepository } from '../../../../src/domain/store/repository/store-repository'
 import { Store } from '../../../../src/domain/store/store'
+import { InterfaceMock } from '../../../helpers/interface-mock'
 
 describe('UpdateStore unit test suite', () => {
     const stubs = {
         storeRepository: {
             get: jest.fn(),
-            exists: jest.fn(),
-            save: jest.fn(),
-            findByUserId: jest.fn(),
-            find: jest.fn()
-        } as StoreRepository
+            save: jest.fn()
+        } as InterfaceMock<StoreRepository>
     }
     const updateStore = new UpdateStore(stubs.storeRepository)
 
     test('Should call storeRepository.get once with arguments', async () => {
         const id = 'store-id'
         const name = 'store-name'
-        const userId = 'user-id'
-        const store = new Store(id, name, userId)
+        const sellerId = 'user-id'
+        const store = new Store({ id, name, sellerId })
         const newName = 'new-store-name'
         const command = new UpdateStoreCommand(id, newName)
-        stubs.storeRepository.get = jest.fn().mockResolvedValue(store)
+        stubs.storeRepository.get.mockResolvedValue(store)
 
         await updateStore.execute(command)
 
@@ -35,11 +33,11 @@ describe('UpdateStore unit test suite', () => {
     test('Should call storeRepository.save once with arguments', async () => {
         const id = 'store-id'
         const name = 'store-name'
-        const userId = 'user-id'
-        const store = new Store(id, name, userId)
+        const sellerId = 'user-id'
+        const store = new Store({ id, name, sellerId })
         const newName = 'new-store-name'
         const command = new UpdateStoreCommand(id, newName)
-        stubs.storeRepository.get = jest.fn().mockResolvedValue(store)
+        stubs.storeRepository.get.mockResolvedValue(store)
 
         await updateStore.execute(command)
 
