@@ -1,8 +1,9 @@
-import { Order } from '../../../domain/order/order'
+import { OrderDetail } from '../../../application/order/find-by-customer-id/find-order-by-customer-id'
 
 type JsonApiOrderItem = {
-    productId: string
+    name: string
     quantity: number
+    image: string | null
 }
 
 type JsonApiOrder = {
@@ -13,10 +14,11 @@ type JsonApiOrder = {
 }
 
 export class JsonApiOrderTransformer {
-    static transform(order: Order): JsonApiOrder {
+    static transform(order: OrderDetail): JsonApiOrder {
         const orderItems = order.items.map((orderItem) => {
             return {
-                productId: orderItem.productId.value,
+                name: orderItem.name,
+                image: orderItem.image,
                 quantity: orderItem.quantity
             }
         })

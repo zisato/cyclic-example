@@ -37,8 +37,13 @@
                             {{#each order.attributes.items}}
                                 <li>
                                     <span class="dropdown-item" href="#">
-                                        <img src="https://dummyimage.com/50x50/dee2e6/6c757d.jpg" alt="" />
-                                        {{this.productId.value}}
+                                        {{#unless this.image}}
+                                            <img src="https://dummyimage.com/50x50/dee2e6/6c757d.jpg" alt="" />
+                                        {{/unless}}
+                                        {{#if this.image}}
+                                            <img src="{{this.image}}" alt="" />
+                                        {{/if}}
+                                        {{this.name}}
                                         {{this.quantity}}
                                         <!-- <button class="btn btn-xs btn-danger pull-right">x</button> -->
                                     </span>
