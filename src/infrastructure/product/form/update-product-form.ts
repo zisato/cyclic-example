@@ -49,10 +49,6 @@ export class UpdateProductForm {
     }
 
     getData(): UpdateProductFormData {
-        if (this.data === null) {
-            throw new Error('Form not handled')
-        }
-
         return this.data
     }
 

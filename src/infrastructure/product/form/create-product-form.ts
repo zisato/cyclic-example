@@ -18,7 +18,7 @@ type CreateProductFormData = {
 }
 
 export class CreateProductForm {
-    private validationError?: ValidationError = undefined
+    private validationError: ValidationError | null = null
     private data: CreateProductFormData | null = null
 
     async handleRequest(request: Request): Promise<void> {
@@ -37,7 +37,7 @@ export class CreateProductForm {
     }
 
     isValid(): boolean {
-        return this.validationError === undefined
+        return this.validationError === null
     }
 
     getData(): CreateProductFormData {

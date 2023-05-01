@@ -9,7 +9,7 @@ type CreateCategoryFormData = {
 }
 
 export class CreateCategoryForm {
-    private validationError?: ValidationError = undefined
+    private validationError: ValidationError | null = null
     private data: CreateCategoryFormData | null = null
 
     async handleRequest(request: Request): Promise<void> {
@@ -24,7 +24,7 @@ export class CreateCategoryForm {
     }
 
     isValid(): boolean {
-        return this.validationError === undefined
+        return this.validationError === null
     }
 
     getData(): CreateCategoryFormData {
