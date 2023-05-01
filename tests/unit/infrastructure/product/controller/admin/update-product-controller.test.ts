@@ -8,9 +8,9 @@ import { FindProductByIdQuery } from '../../../../../../src/application/product/
 // import { InvalidJsonSchemaError } from '../../../../../../src/infrastructure/error/invalid-json-schema-error'
 import { Image } from '../../../../../../src/domain/product/image'
 import { UploadedFile } from 'express-fileupload'
+import { onePixelTransparentPng } from '../../../../../helpers/image-mock'
 
 describe('UpdateProductController unit test', () => {
-  const testPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
   const stubs: {
     request: Partial<Request>
     response: Partial<Response>
@@ -130,7 +130,7 @@ describe('UpdateProductController unit test', () => {
       const productId = UuidV1.create()
       const categoryId = UuidV1.create()
       const storeId = UuidV1.create()
-      const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(testPng, 'base64') })
+      const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(onePixelTransparentPng, 'base64') })
       const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, image: image })
       stubs.request.method = 'GET'
       stubs.request.params = { productId: productId.value }
@@ -187,7 +187,7 @@ describe('UpdateProductController unit test', () => {
       const productId = UuidV1.create()
       const categoryId = UuidV1.create()
       const storeId = UuidV1.create()
-      const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(testPng, 'base64') })
+      const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(onePixelTransparentPng, 'base64') })
       const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, image: image })
       stubs.request.method = 'POST'
       stubs.request.params = { productId: productId.value }
@@ -198,7 +198,7 @@ describe('UpdateProductController unit test', () => {
             name: 'test',
             mimetype: 'image/png',
             size: 0,
-            data: Buffer.from(testPng, 'base64')
+            data: Buffer.from(onePixelTransparentPng, 'base64')
           } 
         } as unknown as UploadedFile
       }

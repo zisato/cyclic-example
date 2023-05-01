@@ -9,9 +9,9 @@ import { FindStoreBySellerIdQuery } from '../../../../../../src/application/stor
 import CreateDemo from '../../../../../../src/application/demo/create/create-demo'
 import { Store } from '../../../../../../src/domain/store/store'
 import { Image } from '../../../../../../src/domain/product/image'
+import { onePixelTransparentPng } from '../../../../../helpers/image-mock'
 
 describe('ListProductsController unit test', () => {
-  const testPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
   const stubs: {
     request: Partial<Request>
     response: Partial<Response>
@@ -103,7 +103,7 @@ describe('ListProductsController unit test', () => {
     const categoryId = UuidV1.create()
     const storeId = UuidV1.create()
     const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
-    const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(testPng, 'base64') })
+    const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(onePixelTransparentPng, 'base64') })
     const products = [
       new Product({ id: product1Id, name: 'product-1-name', categoryId: categoryId, storeId: storeId, image: null }),
       new Product({ id: product2Id, name: 'product-2-name', categoryId: categoryId, storeId: storeId, image: image })
@@ -138,7 +138,7 @@ describe('ListProductsController unit test', () => {
             id: product2Id.value,
             attributes: {
               name: 'product-2-name',
-              image: `data:image/png;base64, ${testPng}`
+              image: `data:image/png;base64, ${onePixelTransparentPng}`
             }
           }
         ]

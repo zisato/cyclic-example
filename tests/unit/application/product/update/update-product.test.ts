@@ -4,10 +4,10 @@ import { Image } from '../../../../../src/domain/product/image'
 import { Product } from '../../../../../src/domain/product/product'
 import { ProductRepository } from '../../../../../src/domain/product/repository/product-repository'
 import { UuidV1 } from '../../../../../src/infrastructure/identity/uuid-v1'
+import { onePixelTransparentPng } from '../../../../helpers/image-mock'
 import { InterfaceMock } from '../../../../helpers/interface-mock'
 
 describe('UpdateProduct unit test suite', () => {
-    const testPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
     const stubs = {
         productRepository: {
             get: jest.fn(),
@@ -63,7 +63,7 @@ describe('UpdateProduct unit test suite', () => {
         const name = 'product-name'
         const categoryId = UuidV1.create()
         const storeId = UuidV1.create()
-        const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(testPng, 'base64') })
+        const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(onePixelTransparentPng, 'base64') })
         const product = new Product({ id, name, categoryId, storeId, image: image })
         const newName = 'new-product-name'
         const command = new UpdateProductCommand(id.value, newName)

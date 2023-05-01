@@ -13,11 +13,10 @@ import { ListCategoriesQuery } from '../../../../../../src/application/category/
 import { Category } from '../../../../../../src/domain/category/category'
 import { Identity } from '../../../../../../src/domain/identity/identity'
 import { UploadedFile } from 'express-fileupload'
+import { onePixelTransparentPng } from '../../../../../helpers/image-mock'
 // import { ClassMock } from '../../../../helpers/interface-mock'
 
 describe('CreateProductController unit test', () => {
-  const testPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
-
   const stubs: {
     request: Partial<Request>
     response: Partial<Response>
@@ -221,7 +220,7 @@ describe('CreateProductController unit test', () => {
             name: 'test',
             mimetype: 'image/png',
             size: 0,
-            data: Buffer.from(testPng, 'base64')
+            data: Buffer.from(onePixelTransparentPng, 'base64')
           } 
         } as unknown as UploadedFile
       }
