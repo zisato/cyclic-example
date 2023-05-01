@@ -5,6 +5,7 @@ import { Product } from '../../../../domain/product/product'
 import { FindProductByIdQuery } from '../../../../application/product/find-by-id/find-product-by-id-query'
 import FindProductById from '../../../../application/product/find-by-id/find-product-by-id'
 import { UpdateProductForm } from '../../form/update-product-form'
+import { JsonApiProductTransformer } from '../../transformer/json-api-product-transformer'
 
 export default class UpdateProductController {
   constructor(private readonly findProductById: FindProductById, private readonly updateProduct: UpdateProduct) { }
@@ -26,13 +27,7 @@ export default class UpdateProductController {
       return res.redirect(`/admin/products/${product.id.value}/update`)
     }
 
-    const productJsonApi = {
-      id: product.id.value,
-      attributes: {
-        name: product.name,
-        image: product.imageAsDataUrl()
-      }
-    }
+    const productJsonApi = JsonApiProductTransformer.transform(product)
 
     res.status(200).render('admin/product/update', {
       product: productJsonApi

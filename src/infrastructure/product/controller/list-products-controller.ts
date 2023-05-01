@@ -6,6 +6,7 @@ import FindStoreById from '../../../application/store/find-by-id/find-store-by-i
 import { FindStoreByIdQuery } from '../../../application/store/find-by-id/find-store-by-id-query'
 import FindOrderByCustomerId from '../../../application/order/find-by-customer-id/find-order-by-customer-id'
 import { FindOrderByCustomerIdCommand } from '../../../application/order/find-by-customer-id/find-order-by-customer-id-command'
+import { JsonApiProductTransformer } from '../transformer/json-api-product-transformer'
 
 export default class ListProductsController {
     constructor(private readonly listProducts: ListProducts, private readonly findStoreById: FindStoreById, private readonly findOrderByCustomerId: FindOrderByCustomerId) { }
@@ -23,13 +24,7 @@ export default class ListProductsController {
 
         const products = await this.listProducts.execute(new ListProductsQuery(store.id.value))
         const productsJsonApi = products.map((product: Product) => {
-            return {
-                id: product.id.value,
-                attributes: {
-                    name: product.name,
-                    image: product.imageAsDataUrl()
-                }
-            }
+            return JsonApiProductTransformer.transform(product)
         })
 
         const order = await this.findOrderByCustomerId.execute(new FindOrderByCustomerIdCommand(customerId))

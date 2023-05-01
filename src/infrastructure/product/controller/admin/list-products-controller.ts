@@ -5,6 +5,7 @@ import FindStoreBySellerId from '../../../../application/store/find-by-seller-id
 import { FindStoreBySellerIdQuery } from '../../../../application/store/find-by-seller-id/find-store-by-seller-id-query'
 import { Product } from '../../../../domain/product/product'
 import { Store } from '../../../../domain/store/store'
+import { JsonApiProductTransformer } from '../../transformer/json-api-product-transformer'
 
 export default class ListProductsController {
     constructor(private readonly listProducts: ListProducts, private readonly findStoreBySellerId: FindStoreBySellerId) { }
@@ -21,13 +22,7 @@ export default class ListProductsController {
 
         const products = await this.listProducts.execute(new ListProductsQuery(store.id.value))
         const productsJsonApi = products.map((product: Product) => {
-            return {
-                id: product.id.value,
-                attributes: {
-                    name: product.name,
-                    image: product.imageAsDataUrl()
-                }
-            }
+            return JsonApiProductTransformer.transform(product)
         })
 
         res.status(200).render('admin/product/list', {
