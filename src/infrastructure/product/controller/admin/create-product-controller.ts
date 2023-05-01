@@ -22,7 +22,8 @@ export default class CreateProductController {
   handle = async (req: Request, res: Response): Promise<void> => {
     if (req.method === 'POST') {
       const createProductForm = new CreateProductForm()
-      createProductForm.handleRequest(req)
+
+      await createProductForm.handleRequest(req)
 
       if (createProductForm.isValid()) {
         const sellerId = this.getSellerId(req)
