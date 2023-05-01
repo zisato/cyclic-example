@@ -13,7 +13,7 @@ export default class AddItemController {
         const command = new AddItemToOrderCommand(customerId, requestBody.attributes.product.id, requestBody.attributes.product.quantity)
         await this.addItemToOrder.execute(command)
 
-        return res.redirect('/')
+        return res.redirect('back')
     }
 
     private ensureValidRequestBody(req: Request): any {

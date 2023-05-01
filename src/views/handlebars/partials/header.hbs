@@ -26,13 +26,36 @@
                         </ul>
                     </li>
                 </ul>
-                <form class="d-flex">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi-cart-fill me-1"></i>
+                            Cart
+                            <span class="badge bg-dark text-white ms-1 rounded-pill">{{order.attributes.items.length}}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            {{#each order.attributes.items}}
+                                <li>
+                                    <span class="dropdown-item" href="#">
+                                        <img src="https://dummyimage.com/50x50/dee2e6/6c757d.jpg" alt="" />
+                                        {{this.productId.value}}
+                                        {{this.quantity}}
+                                        <!-- <button class="btn btn-xs btn-danger pull-right">x</button> -->
+                                    </span>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                            {{/each}}
+                            <li><a class="dropdown-item navbar-text" href="#">View cart</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <!-- <form class="d-flex">
                     <button class="btn btn-outline-dark" type="submit">
                         <i class="bi-cart-fill me-1"></i>
                         Cart
                         <span class="badge bg-dark text-white ms-1 rounded-pill">{{order.attributes.items.length}}</span>
                     </button>
-                </form>
+                </form> -->
             </div>
         </div>
     </nav>

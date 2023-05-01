@@ -1,14 +1,15 @@
 import { ModelNotFoundError } from '../../../domain/error/model-not-found-error'
 import { Identity } from '../../../domain/identity/identity'
 import { Order } from '../../../domain/order/order'
+import { OrderStatus } from '../../../domain/order/order-status'
 import { OrderRepository } from '../../../domain/order/repository/order-repository'
 
 export default class InMemoryOrderRepository implements OrderRepository {
     private readonly data: Order[] = []
     
-    async findByCustomerId(customerId: Identity): Promise<Order | undefined> {
+    async findByCustomerIdAndStatus(customerId: Identity, status: OrderStatus): Promise<Order | undefined> {
         return this.data.find((order: Order) => {
-            return order.customerId.equals(customerId)
+            return order.customerId.equals(customerId) && order.status === status
         })
     }
 

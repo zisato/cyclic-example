@@ -1,4 +1,4 @@
-import { Identity } from "../identity/identity"
+import { Identity } from '../identity/identity'
 
 export class OrderItem {
     readonly productId: Identity

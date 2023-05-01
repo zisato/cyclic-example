@@ -1,14 +1,17 @@
-import { Identity } from "../identity/identity"
-import { OrderItem } from "./order-item"
+import { Identity } from '../identity/identity'
+import { OrderItem } from './order-item'
+import { OrderStatus } from './order-status'
 
 export class Order {
     readonly id: Identity
     readonly customerId: Identity
+    readonly status: OrderStatus
     readonly items: OrderItem[]
 
-    constructor({ id, customerId, items = [] }: { id: Identity, customerId: Identity, items?: OrderItem[] }) {
+    constructor({ id, customerId, status = OrderStatus.draft, items = [] }: { id: Identity, customerId: Identity, status?: OrderStatus, items?: OrderItem[] }) {
         this.id = id
         this.customerId = customerId
+        this.status = status
         this.items = items
     }
 
@@ -26,5 +29,9 @@ export class Order {
         }
 
         return new Order({ ...this, items: newItems })
+    }
+
+    changeStatus(newStatus: OrderStatus): Order {
+        return new Order({ ...this, status: newStatus })
     }
 }
