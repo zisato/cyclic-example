@@ -1,7 +1,7 @@
 import { Identity } from '../../../domain/identity/identity'
 import { UuidV1 } from '../../../infrastructure/identity/uuid-v1'
 
-export class CustomerOrderDetailCommand {
+export class FindOrderByCustomerIdCommand {
     readonly customerId: Identity
 
     constructor(customerId: string) {

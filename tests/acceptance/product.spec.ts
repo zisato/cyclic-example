@@ -68,7 +68,7 @@ describe('Product acceptance test', () => {
   async function givenExistingProduct(id: string, categoryId: string, storeId: string): Promise<void> {
     const productRepository = app.getContainer().get<ProductRepository>('productRepository')
 
-    await productRepository.save(new Product({ id: new UuidV1(id), name: 'product-name', categoryId: new UuidV1(categoryId), storeId: new UuidV1(storeId) }))
+    await productRepository.save(new Product({ id: new UuidV1(id), name: 'product-name', categoryId: new UuidV1(categoryId), storeId: new UuidV1(storeId), image: null }))
   }
 
   test('When not existing category id returns 404 status code', async () => {

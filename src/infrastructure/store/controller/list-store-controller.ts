@@ -2,11 +2,11 @@ import { Request, Response } from 'express'
 import ListStore from '../../../application/store/list/list-store'
 import { ListStoreQuery } from '../../../application/store/list/list-store-query'
 import { Store } from '../../../domain/store/store'
-import CustomerOrderDetail from '../../../application/order/detail/customer-order-detail'
-import { CustomerOrderDetailCommand } from '../../../application/order/detail/customer-order-detail-command'
+import FindOrderByCustomerId from '../../../application/order/find-by-customer-id/find-order-by-customer-id'
+import { FindOrderByCustomerIdCommand } from '../../../application/order/find-by-customer-id/find-order-by-customer-id-command'
 
 export default class ListStoreController {
-    constructor(private readonly listStore: ListStore, private readonly customerOrderDetail: CustomerOrderDetail) { }
+    constructor(private readonly listStore: ListStore, private readonly findOrderByCustomerId: FindOrderByCustomerId) { }
 
     handle = async (req: Request, res: Response): Promise<void> => {
         const customerId = await this.getCustomerId(req)
@@ -21,7 +21,7 @@ export default class ListStoreController {
             }
         })
 
-        const order = await this.customerOrderDetail.execute(new CustomerOrderDetailCommand(customerId))
+        const order = await this.findOrderByCustomerId.execute(new FindOrderByCustomerIdCommand(customerId))
         const orderJsonApi = {
             id: order.id.value,
             attributes: {

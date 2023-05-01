@@ -7,8 +7,8 @@ import FindStoreById from '../../../../src/application/store/find-by-id/find-sto
 import { UuidV1 } from '../../../../src/infrastructure/identity/uuid-v1'
 import { Store } from '../../../../src/domain/store/store'
 import { FindStoreByIdQuery } from '../../../../src/application/store/find-by-id/find-store-by-id-query'
-import CustomerOrderDetail from '../../../../src/application/order/detail/customer-order-detail'
 import { Order } from '../../../../src/domain/order/order'
+import FindOrderByCustomerId from '../../../../src/application/order/find-by-customer-id/find-order-by-customer-id'
 
 describe('ListProductsController unit test', () => {
   const stubs: {
@@ -16,7 +16,7 @@ describe('ListProductsController unit test', () => {
     response: Partial<Response>
     listProducts: Partial<ListProducts>
     findStoreById: Partial<FindStoreById>
-    customerOrderDetail: Partial<CustomerOrderDetail>
+    findOrderByCustomerId: Partial<FindOrderByCustomerId>
   } = {
     request: {
       params: {},
@@ -39,12 +39,12 @@ describe('ListProductsController unit test', () => {
     findStoreById: {
       execute: jest.fn()
     },
-    customerOrderDetail: {
+    findOrderByCustomerId: {
       execute: jest.fn()
     }
   }
 
-  const controller = new ListProductsController(stubs.listProducts as ListProducts, stubs.findStoreById as FindStoreById, stubs.customerOrderDetail as CustomerOrderDetail)
+  const controller = new ListProductsController(stubs.listProducts as ListProducts, stubs.findStoreById as FindStoreById, stubs.findOrderByCustomerId as FindOrderByCustomerId)
 
   test('Should call findStoreById.execute method when valid request body', async () => {
     // Given
@@ -56,7 +56,7 @@ describe('ListProductsController unit test', () => {
     stubs.request.params = { storeId: storeId.value }
     stubs.findStoreById.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue([])
-    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
+    stubs.findOrderByCustomerId.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -77,7 +77,7 @@ describe('ListProductsController unit test', () => {
     stubs.request.params = { storeId: storeId.value }
     stubs.findStoreById.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue([])
-    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
+    stubs.findOrderByCustomerId.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -98,7 +98,7 @@ describe('ListProductsController unit test', () => {
     stubs.request.params = { storeId: storeId.value }
     stubs.findStoreById.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue([])
-    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
+    stubs.findOrderByCustomerId.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -117,7 +117,7 @@ describe('ListProductsController unit test', () => {
     const categoryId = UuidV1.create()
     const store = new Store({ id: storeId, name: 'store-name', sellerId: UuidV1.create() })
     const products = [
-      new Product({ id: productId, name: 'product-name', categoryId: categoryId, storeId: storeId})
+      new Product({ id: productId, name: 'product-name', categoryId: categoryId, storeId: storeId, image: null })
     ]
     const orderId = UuidV1.create()
     const customerId = UuidV1.create()
@@ -126,7 +126,7 @@ describe('ListProductsController unit test', () => {
     stubs.request.params = { storeId: storeId.value }
     stubs.findStoreById.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue(products)
-    stubs.customerOrderDetail.execute = jest.fn().mockResolvedValueOnce(order)
+    stubs.findOrderByCustomerId.execute = jest.fn().mockResolvedValueOnce(order)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)

@@ -4,11 +4,11 @@ import { ListProductsQuery } from '../../../application/product/list/list-produc
 import { Product } from '../../../domain/product/product'
 import FindStoreById from '../../../application/store/find-by-id/find-store-by-id'
 import { FindStoreByIdQuery } from '../../../application/store/find-by-id/find-store-by-id-query'
-import CustomerOrderDetail from '../../../application/order/detail/customer-order-detail'
-import { CustomerOrderDetailCommand } from '../../../application/order/detail/customer-order-detail-command'
+import FindOrderByCustomerId from '../../../application/order/find-by-customer-id/find-order-by-customer-id'
+import { FindOrderByCustomerIdCommand } from '../../../application/order/find-by-customer-id/find-order-by-customer-id-command'
 
 export default class ListProductsController {
-    constructor(private readonly listProducts: ListProducts, private readonly findStoreById: FindStoreById, private readonly customerOrderDetail: CustomerOrderDetail) { }
+    constructor(private readonly listProducts: ListProducts, private readonly findStoreById: FindStoreById, private readonly findOrderByCustomerId: FindOrderByCustomerId) { }
 
     handle = async (req: Request, res: Response): Promise<void> => {
         const customerId = await this.getCustomerId(req)
@@ -32,7 +32,7 @@ export default class ListProductsController {
             }
         })
 
-        const order = await this.customerOrderDetail.execute(new CustomerOrderDetailCommand(customerId))
+        const order = await this.findOrderByCustomerId.execute(new FindOrderByCustomerIdCommand(customerId))
         const orderJsonApi = {
             id: order.id.value,
             attributes: {
