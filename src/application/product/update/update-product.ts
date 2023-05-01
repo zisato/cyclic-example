@@ -7,7 +7,13 @@ export default class UpdateProduct {
     async execute(command: UpdateProductCommand): Promise<void> {
         let product = await this.productRepository.get(command.id)
 
-        product = product.changeName(command.name)
+        if (command.name !== undefined) {
+            product = product.changeName(command.name)
+        }
+
+        if (command.image !== undefined) {
+            product = product.changeImage(command.image)
+        }
 
         this.productRepository.save(product)
     }

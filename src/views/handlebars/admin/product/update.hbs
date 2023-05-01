@@ -4,10 +4,17 @@
             <h4>Update product</h4>
         </div>
         <div class="container px-4 px-lg-5 mt-5">
-            <form enctype="application/x-www-form-urlencoded" action="/admin/products/{{product.id}}/update" method="post" name="product">
+            <form enctype="multipart/form-data" action="/admin/products/{{product.id}}/update" method="post" name="product">
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
                     <input type="text" class="form-control" name="attributes[name]" value="{{product.attributes.name}}">
+                </div>
+                <div class="mb-3">
+                    <label for="attributes[image]" class="form-label">Image</label>
+                    <input type="file" class="form-control" name="attributes[image]"/>
+                    {{#if product.attributes.image}}
+                        <img class="card-img-top" src="{{product.attributes.image}}" alt="" />
+                    {{/if}}
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>

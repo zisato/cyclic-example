@@ -23,16 +23,11 @@ export default class ListProductsController {
 
         const products = await this.listProducts.execute(new ListProductsQuery(store.id.value))
         const productsJsonApi = products.map((product: Product) => {
-            let imageBase64: string | null = null
-            if (product.image !== null) {
-                imageBase64 = `data:${product.image.mimeType};base64, ${product.image.data.toString('base64')}`
-            }
-
             return {
                 id: product.id.value,
                 attributes: {
                     name: product.name,
-                    image: imageBase64
+                    image: product.imageAsDataUrl()
                 }
             }
         })
