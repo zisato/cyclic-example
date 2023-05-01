@@ -24,7 +24,8 @@ export default class ListProductsController {
             return {
                 id: product.id.value,
                 attributes: {
-                    name: product.name
+                    name: product.name,
+                    image: product.imageAsDataUrl()
                 }
             }
         })
