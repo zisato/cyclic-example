@@ -11,6 +11,7 @@ import { Identity } from '../../../../domain/identity/identity'
 import { CreateProductForm } from '../../form/create-product-form'
 import { Image } from '../../../../domain/product/image'
 import { File } from '../../../file-storage/file'
+import { JsonApiCategoryTransformer } from '../../../category/transformer/json-api-category-transformer'
 
 export default class CreateProductController {
   constructor(
@@ -46,12 +47,7 @@ export default class CreateProductController {
 
     const categories = await this.listCategories.execute(new ListCategoriesQuery())
     const categoriesJsonApi = categories.map((category: Category) => {
-      return {
-        id: category.id.value,
-        attributes: {
-          name: category.name
-        }
-      }
+      return JsonApiCategoryTransformer.transform(category)
     })
 
     res.status(200).render('admin/product/create', {

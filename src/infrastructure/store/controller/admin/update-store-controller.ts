@@ -6,6 +6,7 @@ import { FindStoreBySellerIdQuery } from '../../../../application/store/find-by-
 import UpdateStore from '../../../../application/store/update/update-store'
 import { UpdateStoreCommand } from '../../../../application/store/update/update-store-command'
 import { InvalidJsonSchemaError } from '../../../error/invalid-json-schema-error'
+import { JsonApiStoreTransformer } from '../../transformer/json-api-store-transformer'
 
 export default class UpdateStoreController {
     constructor(private readonly findStoreBySellerId: FindStoreBySellerId, private readonly updateStore: UpdateStore) { }
@@ -21,12 +22,7 @@ export default class UpdateStoreController {
             return res.redirect('/admin/stores/update')
         }
 
-        const storeJsonApi = {
-            id: store.id.value,
-            attributes: {
-                name: store.name
-            }
-        }
+        const storeJsonApi = JsonApiStoreTransformer.transform(store)
 
         res.status(200).render('admin/store/update', {
             store: storeJsonApi

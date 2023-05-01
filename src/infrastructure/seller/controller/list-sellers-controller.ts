@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import ListSellers from '../../../application/seller/list/list-sellers'
 import { ListSellersQuery } from '../../../application/seller/list/list-sellers-query'
 import { Seller } from '../../../domain/seller/seller'
+import { JsonApiSellerTransformer } from '../transformer/json-api-seller-transformer'
 
 export default class ListSellersController {
     constructor(private readonly listSellers: ListSellers) { }
@@ -9,16 +10,11 @@ export default class ListSellersController {
     handle = async (_req: Request, res: Response): Promise<void> => {
         const query = new ListSellersQuery()
 
-        const stores = await this.listSellers.execute(query)
-        const storesJsonApi = stores.map((seller: Seller) => {
-            return {
-                id: seller.id.value,
-                attributes: {
-                    name: seller.name
-                }
-            }
+        const sellers = await this.listSellers.execute(query)
+        const sellersJsonApi = sellers.map((seller: Seller) => {
+            return JsonApiSellerTransformer.transform(seller)
         })
 
-        res.json(storesJsonApi)
+        res.json(sellersJsonApi)
     }
 }

@@ -7,6 +7,8 @@ import { FindStoreByIdQuery } from '../../../application/store/find-by-id/find-s
 import FindOrderByCustomerId from '../../../application/order/find-by-customer-id/find-order-by-customer-id'
 import { FindOrderByCustomerIdCommand } from '../../../application/order/find-by-customer-id/find-order-by-customer-id-command'
 import { JsonApiProductTransformer } from '../transformer/json-api-product-transformer'
+import { JsonApiStoreTransformer } from '../../store/transformer/json-api-store-transformer'
+import { JsonApiOrderTransformer } from '../../order/transformer/json-api-order-transformer'
 
 export default class ListProductsController {
     constructor(private readonly listProducts: ListProducts, private readonly findStoreById: FindStoreById, private readonly findOrderByCustomerId: FindOrderByCustomerId) { }
@@ -15,12 +17,7 @@ export default class ListProductsController {
         const customerId = await this.getCustomerId(req)
 
         const store = await this.findStoreById.execute(new FindStoreByIdQuery(req.params.storeId))
-        const storeJsonApi = {
-            id: store.id.value,
-            attributes: {
-                name: store.name
-            }
-        }
+        const storeJsonApi = JsonApiStoreTransformer.transform(store)
 
         const products = await this.listProducts.execute(new ListProductsQuery(store.id.value))
         const productsJsonApi = products.map((product: Product) => {
@@ -28,12 +25,7 @@ export default class ListProductsController {
         })
 
         const order = await this.findOrderByCustomerId.execute(new FindOrderByCustomerIdCommand(customerId))
-        const orderJsonApi = {
-            id: order.id.value,
-            attributes: {
-                items: order.items
-            }
-        }
+        const orderJsonApi = JsonApiOrderTransformer.transform(order)
 
         res.status(200).render('product/list', {
             store: storeJsonApi,

@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import ListStore from '../../application/store/list/list-store'
 import { ListStoreQuery } from '../../application/store/list/list-store-query'
 import { Store } from '../../domain/store/store'
+import { JsonApiStoreTransformer } from '../store/transformer/json-api-store-transformer'
 
 export default class IndexController {
     constructor(private readonly listStore: ListStore) { }
@@ -11,12 +12,7 @@ export default class IndexController {
 
         const stores = await this.listStore.execute(query)
         const storesJsonApi = stores.map((store: Store) => {
-            return {
-                id: store.id.value,
-                attributes: {
-                    name: store.name
-                }
-            }
+            return JsonApiStoreTransformer.transform(store)
         })
 
         res.render('store/list', {

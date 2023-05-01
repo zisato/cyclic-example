@@ -4,6 +4,8 @@ import { ListStoreQuery } from '../../../application/store/list/list-store-query
 import { Store } from '../../../domain/store/store'
 import FindOrderByCustomerId from '../../../application/order/find-by-customer-id/find-order-by-customer-id'
 import { FindOrderByCustomerIdCommand } from '../../../application/order/find-by-customer-id/find-order-by-customer-id-command'
+import { JsonApiStoreTransformer } from '../transformer/json-api-store-transformer'
+import { JsonApiOrderTransformer } from '../../order/transformer/json-api-order-transformer'
 
 export default class ListStoreController {
     constructor(private readonly listStore: ListStore, private readonly findOrderByCustomerId: FindOrderByCustomerId) { }
@@ -13,21 +15,11 @@ export default class ListStoreController {
 
         const stores = await this.listStore.execute(new ListStoreQuery())
         const storesJsonApi = stores.map((store: Store) => {
-            return {
-                id: store.id.value,
-                attributes: {
-                    name: store.name
-                }
-            }
+            return JsonApiStoreTransformer.transform(store)
         })
 
         const order = await this.findOrderByCustomerId.execute(new FindOrderByCustomerIdCommand(customerId))
-        const orderJsonApi = {
-            id: order.id.value,
-            attributes: {
-                items: order.items
-            }
-        }
+        const orderJsonApi = JsonApiOrderTransformer.transform(order)
 
         res.status(200).render('store/list', {
             stores: storesJsonApi,
