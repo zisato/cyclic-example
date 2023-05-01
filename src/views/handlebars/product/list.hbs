@@ -13,7 +13,12 @@
                     <div class="col mb-5">
                         <div class="card h-100">
                             <!-- Product image-->
-                            <img class="card-img-top" src="https://dummyimage.com/450x200/dee2e6/6c757d.jpg" alt="" />
+                            {{#unless this.attributes.image}}
+                                <img class="card-img-top" src="https://dummyimage.com/450x200/dee2e6/6c757d.jpg" alt="" />
+                            {{/unless}}
+                            {{#if this.attributes.image}}
+                                <img class="card-img-top" src="{{this.attributes.image}}" alt="" />
+                            {{/if}}
                             <!-- Product details-->
                             <div class="card-body p-4">
                                 <div class="text-center">

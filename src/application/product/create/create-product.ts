@@ -18,6 +18,6 @@ export default class CreateProduct {
             this.storeRepository
         )
 
-        await service.create(command.id, command.name, command.categoryId, command.storeId)
+        await service.create(command.id, command.name, command.categoryId, command.storeId, command.image)
     }
 }
