@@ -13,6 +13,12 @@ export default class InMemoryOrderRepository implements OrderRepository {
         })
     }
 
+    async findByStoreId(storeId: Identity): Promise<Order[]> {
+        return this.data.filter((order: Order) => {
+            return order.storeId.equals(storeId)
+        })
+    }
+
     async get (id: Identity): Promise<Order> {
         const existingOrderIndex = this.data.findIndex((order: Order) => {
             return order.id.equals(id)

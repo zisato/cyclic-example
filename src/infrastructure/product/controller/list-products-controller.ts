@@ -24,8 +24,11 @@ export default class ListProductsController {
             return JsonApiProductTransformer.transform(product)
         })
 
+        let orderJsonApi = null
         const orderDetail = await this.findOrderByCustomerId.execute(new FindOrderByCustomerIdCommand(customerId))
-        const orderJsonApi = JsonApiOrderTransformer.transform(orderDetail)
+        if (orderDetail) {
+            orderJsonApi = JsonApiOrderTransformer.transform(orderDetail)
+        }
 
         res.status(200).render('product/list', {
             store: storeJsonApi,

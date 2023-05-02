@@ -5,12 +5,14 @@ import { OrderStatus } from './order-status'
 export class Order {
     readonly id: Identity
     readonly customerId: Identity
+    readonly storeId: Identity
     readonly status: OrderStatus
     readonly items: OrderItem[]
 
-    constructor({ id, customerId, status = OrderStatus.draft, items = [] }: { id: Identity, customerId: Identity, status?: OrderStatus, items?: OrderItem[] }) {
+    constructor({ id, customerId, storeId, status = OrderStatus.draft, items = [] }: { id: Identity, customerId: Identity, storeId: Identity, status?: OrderStatus, items?: OrderItem[] }) {
         this.id = id
         this.customerId = customerId
+        this.storeId = storeId
         this.status = status
         this.items = items
     }

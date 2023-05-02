@@ -1,9 +1,10 @@
 import { Identity } from '../../../domain/identity/identity'
+import { Order } from '../../../domain/order/order'
 import { OrderItem } from '../../../domain/order/order-item'
 import { OrderStatus } from '../../../domain/order/order-status'
 import { OrderRepository } from '../../../domain/order/repository/order-repository'
 import { ProductRepository } from '../../../domain/product/repository/product-repository'
-import { FindOrderByCustomerIdCommand } from './find-order-by-customer-id-command'
+import { FindOrdersByStoreIdQuery } from './find-orders-by-store-id-query'
 
 type OrderItemDetail = {
     productId: string
@@ -13,24 +14,35 @@ type OrderItemDetail = {
 }
 export type OrderDetail = {
     id: Identity
+    status: OrderStatus
     items: OrderItemDetail[]
 }
 
-export default class FindOrderByCustomerId {
+export default class FindOrdersByStoreId {
     constructor (private readonly orderRepository: OrderRepository, private readonly productRepository: ProductRepository) {}
 
-    async execute(command: FindOrderByCustomerIdCommand): Promise<OrderDetail | null> {
-        let order = await this.orderRepository.findByCustomerIdAndStatus(command.customerId, OrderStatus.draft)
-        if (!order) {
-            return null
+    async execute(command: FindOrdersByStoreIdQuery): Promise<OrderDetail[]> {
+        const orders = await this.orderRepository.findByStoreId(command.storeId)
+
+        const orderDetails = this.getOrderDetails(orders)
+
+        return orderDetails
+    }
+
+    private async getOrderDetails(orders: Order[]): Promise<OrderDetail[]> {
+        const orderDetails: OrderDetail[] = []
+        for (const order of orders) {
+            const orderItems = await this.getOrderItemsDetail(order.items)
+            const orderDetail = {
+                id: order.id,
+                status: order.status,
+                items: orderItems
+            }
+
+            orderDetails.push(orderDetail)
         }
 
-        const orderItems = await this.getOrderItemsDetail(order.items)
-
-        return {
-            id: order.id,
-            items: orderItems
-        }
+        return orderDetails
     }
 
     private async getOrderItemsDetail(orderItems: OrderItem[]): Promise<OrderItemDetail[]> {

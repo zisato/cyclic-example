@@ -3,6 +3,7 @@ import { Router } from 'express'
 import { CategoryRouteLoader } from './admin/category'
 import { ProductRouteLoader } from './admin/product'
 import { StoreRouteLoader } from './admin/store'
+import { OrderRouteLoader } from './admin/order'
 import { RouterConfiguration } from '../../src/simple-kernel/configuration/router-configuration'
 
 export class AdminRouterConfiguration implements RouterConfiguration {
@@ -10,7 +11,8 @@ export class AdminRouterConfiguration implements RouterConfiguration {
         return [
             ...(new CategoryRouteLoader().getRoutersConfiguration(container)),
             ...(new ProductRouteLoader().getRoutersConfiguration(container)),
-            ...(new StoreRouteLoader().getRoutersConfiguration(container))
+            ...(new StoreRouteLoader().getRoutersConfiguration(container)),
+            ...(new OrderRouteLoader().getRoutersConfiguration(container))
         ]
     }
 }
