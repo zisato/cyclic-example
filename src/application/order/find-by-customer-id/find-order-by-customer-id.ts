@@ -8,6 +8,7 @@ import { UuidV1 } from '../../../infrastructure/identity/uuid-v1'
 import { FindOrderByCustomerIdCommand } from './find-order-by-customer-id-command'
 
 type OrderItemDetail = {
+    productId: string
     name: string
     quantity: number
     image: string | null
@@ -42,6 +43,7 @@ export default class FindOrderByCustomerId {
             const product = await this.productRepository.get(orderItem.productId)
 
             result.push({
+                productId: product.id.value,
                 name: product.name,
                 quantity: orderItem.quantity,
                 image: product.imageAsDataUrl()

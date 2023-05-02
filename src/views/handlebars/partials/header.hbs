@@ -77,7 +77,10 @@
                                                                     <span class="text-muted">Quantity: {{this.quantity}}</span>
                                                                 </td>
                                                                 <td>
-                                                                    <button class="btn-close"></button>
+                                                                    <form action="/cart/items/{{this.productId}}" method="post">
+                                                                        <input type="hidden" name="_method" value="DELETE" />
+                                                                        <button class="btn-close" type="submit"></button>
+                                                                    </form>
                                                                 </td>
                                                             </tr>
                                                         </tbody>

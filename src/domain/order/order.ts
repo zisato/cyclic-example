@@ -31,6 +31,17 @@ export class Order {
         return new Order({ ...this, items: newItems })
     }
 
+    removeItem(productId: Identity): Order {
+        const existingItemIndex = this.items.findIndex((i) => i.productId.equals(productId))
+        const newItems = this.items
+
+        if (existingItemIndex > -1) {
+            newItems.splice(existingItemIndex, 1)
+        }
+
+        return new Order({ ...this, items: newItems })
+    }
+
     changeStatus(newStatus: OrderStatus): Order {
         return new Order({ ...this, status: newStatus })
     }
