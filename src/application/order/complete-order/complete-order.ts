@@ -11,13 +11,13 @@ export default class CompleteOrder {
         let order = await this.orderRepository.get(command.orderId)
         this.ensureOrderCustomer(order, command.customerId)
 
-        order = order.changeStatus(OrderStatus.draft)
+        order = order.changeStatus(OrderStatus.pending)
 
         await this.orderRepository.save(order)
     }
 
     private ensureOrderCustomer(order: Order, customerId: Identity): void {
-        if (order.customerId !== customerId) {
+        if (!order.customerId.equals(customerId)) {
             throw new Error('Invalid order customer')
         }
     }
