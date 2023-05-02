@@ -2,13 +2,16 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container px-4 px-lg-5">
             <a class="navbar-brand" href="#!">Brand name</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                     <li class="nav-item"><a class="nav-link" aria-current="page" href="/">Home</a></li>
-                    
+
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             Admin
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -17,42 +20,68 @@
                                     <button type="submit" class="dropdown-item">Create Demo</button>
                                 </form>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item" href="/admin/stores/update">Update Store</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item" href="/admin/categories">Categories</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item" href="/admin/products">Products</a></li>
                         </ul>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 ms-lg-4">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi-cart-fill me-1"></i>
                             Cart
-                            <span class="badge bg-dark text-white ms-1 rounded-pill">{{order.attributes.items.length}}</span>
+                            <span
+                                class="badge bg-dark text-white ms-1 rounded-pill">{{order.attributes.items.length}}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             {{#each order.attributes.items}}
-                                <li>
-                                    <span class="dropdown-item" href="#">
-                                        {{#unless this.image}}
-                                            <img src="https://dummyimage.com/50x50/dee2e6/6c757d.jpg" alt="" />
-                                        {{/unless}}
-                                        {{#if this.image}}
-                                            <img src="{{this.image}}" alt="" />
-                                        {{/if}}
-                                        <span class="fw-bold">
-                                            {{this.name}}
-                                        </span>
-                                        <span>
-                                            Quantity: {{this.quantity}}
-                                        </span>
-                                        <!-- <button class="btn btn-xs btn-danger pull-right">x</button> -->
-                                    </span>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <span class="dropdown-item">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col">
+                                                <table>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="pe-2">
+                                                                {{#unless this.image}}
+                                                                    <img src="https://dummyimage.com/50x50/dee2e6/6c757d.jpg" alt="" />
+                                                                {{/unless}}
+                                                                {{#if this.image}}
+                                                                    <img src="{{this.image}}" alt="" />
+                                                                {{/if}}
+                                                            </td>
+                                                            <td class="pe-4">
+                                                                <span class="text-black">{{this.name}}</span>
+                                                                <br />
+                                                                <span class="text-muted">Quantity: {{this.quantity}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-danger pull-right">x</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </span>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             {{/each}}
                             <li><a class="dropdown-item navbar-text" href="#">View cart</a></li>
                         </ul>
