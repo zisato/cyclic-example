@@ -43,8 +43,12 @@
                                         {{#if this.image}}
                                             <img src="{{this.image}}" alt="" />
                                         {{/if}}
-                                        {{this.name}}
-                                        {{this.quantity}}
+                                        <span class="fw-bold">
+                                            {{this.name}}
+                                        </span>
+                                        <span>
+                                            Quantity: {{this.quantity}}
+                                        </span>
                                         <!-- <button class="btn btn-xs btn-danger pull-right">x</button> -->
                                     </span>
                                 </li>
