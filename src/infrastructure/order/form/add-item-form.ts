@@ -1,17 +1,19 @@
-import * as joi from 'joi'
 import { Request } from 'express'
-import { ValidationError } from 'joi'
 import { Form } from '../../form/form'
+import joi, { ValidationError } from 'joi'
 
-type CreateCategoryFormData = {
+type AddItemFormData = {
     attributes: {
-        name: string
+        product: {
+            id: string
+            quantity: number
+        }
     }
 }
 
-export class CreateCategoryForm implements Form<CreateCategoryFormData> {
+export class AddItemForm implements Form<AddItemFormData> {
     private validationError: ValidationError | null = null
-    private data: CreateCategoryFormData | null = null
+    private data: AddItemFormData | null = null
 
     async handleRequest(request: Request): Promise<void> {
         const validationResult = this.getValidationBodyResult(request.body)
@@ -28,7 +30,7 @@ export class CreateCategoryForm implements Form<CreateCategoryFormData> {
         return this.validationError === null
     }
 
-    getData(): CreateCategoryFormData {
+    getData(): AddItemFormData {
         if (this.data === null) {
             throw new Error('Form not handled')
         }
@@ -40,10 +42,13 @@ export class CreateCategoryForm implements Form<CreateCategoryFormData> {
         return this.validationError
     }
 
-    private getValidationBodyResult(data: any): joi.ValidationResult<CreateCategoryFormData> {
+    private getValidationBodyResult(data: any): joi.ValidationResult<AddItemFormData> {
         const schema = joi.object({
             attributes: joi.object({
-                name: joi.string().required()
+                product: joi.object({
+                    id: joi.string().required(),
+                    quantity: joi.number().default(1)
+                }).required()
             }).required(),
         })
 

@@ -4,6 +4,7 @@ import { FileArray, UploadedFile } from 'express-fileupload'
 import { File } from '../../file-storage/file'
 import { ValidationError } from 'joi'
 import sharp from 'sharp'
+import { Form } from '../../form/form'
 
 type CreateProductFormData = {
     attributes: {
@@ -17,7 +18,7 @@ type CreateProductFormData = {
     }
 }
 
-export class CreateProductForm {
+export class CreateProductForm implements Form<CreateProductFormData> {
     private validationError: ValidationError | null = null
     private data: CreateProductFormData | null = null
 
@@ -46,6 +47,10 @@ export class CreateProductForm {
         }
 
         return this.data
+    }
+
+    getError(): ValidationError | null {
+        return this.validationError
     }
 
     private async handleImageFile(fileArray: FileArray): Promise<File> {

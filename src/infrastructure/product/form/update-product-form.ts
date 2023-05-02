@@ -5,6 +5,7 @@ import { File } from '../../file-storage/file'
 import { ValidationError } from 'joi'
 import sharp from 'sharp'
 import { Product } from '../../../domain/product/product'
+import { Form } from '../../form/form'
 
 type UpdateProductFormData = {
     attributes: {
@@ -13,7 +14,7 @@ type UpdateProductFormData = {
     }
 }
 
-export class UpdateProductForm {
+export class UpdateProductForm implements Form<UpdateProductFormData> {
     private validationError: ValidationError | null = null
     private data: UpdateProductFormData
 

@@ -1,37 +1,25 @@
 import { Request, Response } from 'express'
-import * as joi from 'joi'
-import { InvalidJsonSchemaError } from '../../error/invalid-json-schema-error'
 import { AddItemToOrderCommand } from '../../../application/order/add-item/add-item-to-order-command'
 import AddItemToOrder from '../../../application/order/add-item/add-item-to-order'
+import { AddItemForm } from '../form/add-item-form'
 
 export default class AddItemController {
     constructor(private readonly addItemToOrder: AddItemToOrder) {}
 
     handle = async (req: Request, res: Response): Promise<void> => {
-        const customerId = this.getCustomerId(req)
-        const requestBody = this.ensureValidRequestBody(req)
-        const command = new AddItemToOrderCommand(customerId, requestBody.attributes.product.id, requestBody.attributes.product.quantity)
-        await this.addItemToOrder.execute(command)
+        const addItemForm = new AddItemForm()
+    
+        await addItemForm.handleRequest(req)
 
-        return res.redirect('back')
-    }
+        if (addItemForm.isValid()) {
+            const customerId = this.getCustomerId(req)
+            const addItemFormData = addItemForm.getData()
 
-    private ensureValidRequestBody(req: Request): any {
-        const schema = joi.object({
-            attributes: joi.object({
-                product: joi.object({
-                    id: joi.string().required(),
-                    quantity: joi.number().default(1)
-                }).required()
-            }).required(),
-        })
-        const validationResult = schema.validate(req.body)
-
-        if (validationResult.error != null) {
-            throw new InvalidJsonSchemaError(validationResult.error.message)
+            const command = new AddItemToOrderCommand(customerId, addItemFormData.attributes.product.id, addItemFormData.attributes.product.quantity)
+            await this.addItemToOrder.execute(command)
         }
 
-        return validationResult.value
+        return res.redirect('back')
     }
 
     private getCustomerId(req: Request): string {
