@@ -36,8 +36,9 @@ describe('ListStoreController unit test', () => {
 
   test('Should call listStore.execute method when valid request', async () => {
     // Given
+    const storeId = UuidV1.create()
     const customerId = UuidV1.create()
-    const order = new Order({ id: UuidV1.create(), customerId })
+    const order = new Order({ id: UuidV1.create(), customerId, storeId })
     stubs.request.user = { id: customerId.value }
     stubs.listStore.execute = jest.fn().mockResolvedValueOnce([])
     stubs.findOrderByCustomerId.execute = jest.fn().mockResolvedValueOnce(order)
@@ -53,8 +54,9 @@ describe('ListStoreController unit test', () => {
 
   test('Should return 200 when valid request', async () => {
     // Given
+    const storeId = UuidV1.create()
     const customerId = UuidV1.create()
-    const order = new Order({ id: UuidV1.create(), customerId })
+    const order = new Order({ id: UuidV1.create(), customerId, storeId })
     stubs.request.user = { id: customerId.value }
     stubs.listStore.execute = jest.fn().mockResolvedValueOnce([])
     stubs.findOrderByCustomerId.execute = jest.fn().mockResolvedValueOnce(order)
@@ -69,10 +71,10 @@ describe('ListStoreController unit test', () => {
 
   test('Should return JsonApi body when valid request', async () => {
     // Given
+    const storeId = UuidV1.create()
     const customerId = UuidV1.create()
     const orderId = UuidV1.create()
-    const order = new Order({ id: orderId, customerId })
-    const storeId = UuidV1.create()
+    const order = new Order({ id: orderId, customerId, storeId })
     const storeName = 'store-name'
     const storeSellerId = UuidV1.create()
     const stores = [

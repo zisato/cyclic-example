@@ -23,11 +23,16 @@ export class UpdateStoreForm implements Form<UpdateStoreFormData> {
     }
 
     async handleRequest(request: Request): Promise<void> {
-        const validationResult = this.getValidationBodyResult(request.body)
+        const validationResult = this.getValidationBodyResult(request)
         if (validationResult.error !== undefined) {
             this.validationError = validationResult.error
 
             return
+        }
+
+        this.data = {
+            ...this.data,
+            ...validationResult.value,
         }
     }
 
@@ -46,8 +51,8 @@ export class UpdateStoreForm implements Form<UpdateStoreFormData> {
     private getValidationBodyResult(req: Request): joi.ValidationResult<UpdateStoreFormData> {
         const schema = joi.object({
             attributes: joi.object({
-                name: joi.string().required()
-            }).required()
+                name: joi.string()
+            })
         })
 
         return schema.validate(req.body)
