@@ -1,12 +1,11 @@
-import * as joi from 'joi'
 import { Request, Response } from 'express'
 import { Store } from '../../../../domain/store/store'
 import FindStoreBySellerId from '../../../../application/store/find-by-seller-id/find-store-by-seller-id'
 import { FindStoreBySellerIdQuery } from '../../../../application/store/find-by-seller-id/find-store-by-seller-id-query'
 import UpdateStore from '../../../../application/store/update/update-store'
 import { UpdateStoreCommand } from '../../../../application/store/update/update-store-command'
-import { InvalidJsonSchemaError } from '../../../error/invalid-json-schema-error'
 import { JsonApiStoreTransformer } from '../../transformer/json-api-store-transformer'
+import { UpdateStoreForm } from '../../form/update-store-form'
 
 export default class UpdateStoreController {
     constructor(private readonly findStoreBySellerId: FindStoreBySellerId, private readonly updateStore: UpdateStore) { }
@@ -16,8 +15,15 @@ export default class UpdateStoreController {
         const store = await this.getStore(sellerId)
 
         if (req.method === 'POST') {
-            const requestBody = this.ensureValidRequestBody(req)
-            await this.updateStore.execute(new UpdateStoreCommand(store.id.value, requestBody.attributes.name))
+            const updateStoreForm = new UpdateStoreForm(store)
+
+            await updateStoreForm.handleRequest(req)
+
+            if (updateStoreForm.isValid()) {
+                const updateStoreFormData = updateStoreForm.getData()
+
+                await this.updateStore.execute(new UpdateStoreCommand(store.id.value, updateStoreFormData.attributes.name))
+            }
 
             return res.redirect('/admin/stores/update')
         }
@@ -39,20 +45,5 @@ export default class UpdateStoreController {
 
     private async getStore(sellerId: string): Promise<Store> {
         return await this.findStoreBySellerId.execute(new FindStoreBySellerIdQuery(sellerId))
-    }
-
-    private ensureValidRequestBody(req: Request): any {
-        const schema = joi.object({
-            attributes: joi.object({
-                name: joi.string().required()
-            }).required()
-        })
-        const validationResult = schema.validate(req.body)
-
-        if (validationResult.error != null) {
-            throw new InvalidJsonSchemaError(validationResult.error.message)
-        }
-
-        return validationResult.value
     }
 }
