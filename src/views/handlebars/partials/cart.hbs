@@ -1,0 +1,71 @@
+<ul class="navbar-nav ms-auto mb-2 mb-lg-0 ms-lg-4">
+    <li class="nav-item dropdown">
+        {{#unless order}}
+            <a class="nav-link" href="#">
+                <i class="bi-cart-fill me-1"></i>
+                Cart
+                <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+            </a>
+        {{/unless}}
+        {{#if order.attributes.items.length}}
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi-cart-fill me-1"></i>
+                Cart
+                <span
+                    class="badge bg-dark text-white ms-1 rounded-pill">{{order.attributes.items.length}}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <li>
+                    <span class="dropdown-item">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col">
+                                    <table>
+                                        <tbody>
+                                        {{#each order.attributes.items}}
+                                            <tr>
+                                                <td class="pe-2">
+                                                    {{#unless this.image}}
+                                                        <img src="https://dummyimage.com/50x50/dee2e6/6c757d.jpg" alt="" />
+                                                    {{/unless}}
+                                                    {{#if this.image}}
+                                                        <img src="{{this.image}}" alt="" />
+                                                    {{/if}}
+                                                </td>
+                                                <td class="pe-4">
+                                                    <span class="text-black">{{this.name}}</span>
+                                                    <br />
+                                                    <span class="text-muted">Quantity: {{this.quantity}}</span>
+                                                </td>
+                                                <td>
+                                                    <form action="/cart/items/{{this.productId}}" method="post">
+                                                        <input type="hidden" name="_method" value="DELETE" />
+                                                        <button class="btn-close" type="submit"></button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {{/each}}
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </span>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                
+                <li>
+                    <form class="d-grid gap-2 col-8 mx-auto" action="/cart/{{order.id}}/complete" method="post" class="d-flex">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            Complete order
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        {{/if}}
+    </li>
+</ul>
