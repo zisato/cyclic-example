@@ -8,7 +8,6 @@ describe('NodeConfigParameters unit test suite', () => {
 
     describe('has method', () => {
         test('Should return true when exists', () => {
-            const parameters = new NodeConfigParameters()
             const existingName = 'existing.name'
             const configValue = {
                 existing: {
@@ -18,6 +17,7 @@ describe('NodeConfigParameters unit test suite', () => {
             const mockedValue = config.util.extendDeep(config, configValue)
             const configMock = jest.spyOn(config.util, 'extendDeep')
             configMock.mockReturnValueOnce(mockedValue)
+            const parameters = new NodeConfigParameters()
 
             const result = parameters.has(existingName)
 
@@ -25,12 +25,12 @@ describe('NodeConfigParameters unit test suite', () => {
         })
 
         test('Should return false when not exists', () => {
-            const parameters = new NodeConfigParameters()
             const notExistingName = 'not.existing.name'
             const configValue = {}
             const mockedValue = config.util.extendDeep(config, configValue)
             const configMock = jest.spyOn(config.util, 'extendDeep')
             configMock.mockReturnValueOnce(mockedValue)
+            const parameters = new NodeConfigParameters()
 
             const result = parameters.has(notExistingName)
 
@@ -40,7 +40,6 @@ describe('NodeConfigParameters unit test suite', () => {
 
     describe('get method', () => {
         test('Should return value when exists', () => {
-            const parameters = new NodeConfigParameters()
             const existingName = 'existing.name'
             const configValue = {
                 existing: {
@@ -50,6 +49,7 @@ describe('NodeConfigParameters unit test suite', () => {
             const mockedValue = config.util.extendDeep(config, configValue)
             const configMock = jest.spyOn(config.util, 'extendDeep')
             configMock.mockReturnValueOnce(mockedValue)
+            const parameters = new NodeConfigParameters()
 
             const result = parameters.get(existingName)
 
@@ -58,12 +58,12 @@ describe('NodeConfigParameters unit test suite', () => {
         })
 
         test('Should throw error when not exists', () => {
-            const parameters = new NodeConfigParameters()
             const notExistingName = 'not.existing.name'
             const configValue = {}
             const mockedValue = config.util.extendDeep(config, configValue)
             const configMock = jest.spyOn(config.util, 'extendDeep')
             configMock.mockReturnValueOnce(mockedValue)
+            const parameters = new NodeConfigParameters()
 
             const expectedError = new Error(`parameter with name ${notExistingName} not exists`)
             expect(() => {

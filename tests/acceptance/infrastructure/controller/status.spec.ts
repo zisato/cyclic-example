@@ -1,7 +1,7 @@
 
 import { Server } from 'http'
 import request from 'supertest'
-import { App } from '../../src/app'
+import { App } from '../../../../src/app'
 
 describe('Status acceptance test', () => {
   const route = '/status'

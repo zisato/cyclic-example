@@ -5,7 +5,8 @@ export class NodeConfigParameters implements Parameters {
     private config: IConfig
 
     constructor() {
-        this.config = config.util.extendDeep(config, { environment: config.util.getEnv('NODE_ENV') })
+        const currentConfig = config.util.cloneDeep(config)
+        this.config = config.util.extendDeep(currentConfig, { environment: currentConfig.util.getEnv('NODE_ENV') })
     }
 
     has(name: string): boolean {

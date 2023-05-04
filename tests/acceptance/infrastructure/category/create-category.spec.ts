@@ -1,9 +1,9 @@
 import { Server } from 'http'
 import request from 'supertest'
-import { App } from '../../../src/app'
-import { Category } from '../../../src/domain/category/category'
-import { CategoryRepository } from '../../../src/domain/category/repository/category-repository'
-import { UuidV1 } from '../../../src/infrastructure/identity/uuid-v1'
+import { App } from '../../../../src/app'
+import { Category } from '../../../../src/domain/category/category'
+import { CategoryRepository } from '../../../../src/domain/category/repository/category-repository'
+import { UuidV1 } from '../../../../src/infrastructure/identity/uuid-v1'
 
 describe('Create Category acceptance test', () => {
   let server: Server | null = null

@@ -1,6 +1,6 @@
 import { Server } from 'http'
 import request from 'supertest'
-import { App } from '../../../src/app'
+import { App } from '../../../../src/app'
 
 describe('List Categories acceptance test', () => {
   let server: Server | null = null
