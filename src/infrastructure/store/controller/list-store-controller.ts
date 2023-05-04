@@ -3,7 +3,7 @@ import ListStore from '../../../application/store/list/list-store'
 import { ListStoreQuery } from '../../../application/store/list/list-store-query'
 import { Store } from '../../../domain/store/store'
 import FindOrderByCustomerId from '../../../application/order/find-by-customer-id/find-order-by-customer-id'
-import { FindOrderByCustomerIdCommand } from '../../../application/order/find-by-customer-id/find-order-by-customer-id-command'
+import { FindOrderByCustomerIdQuery } from '../../../application/order/find-by-customer-id/find-order-by-customer-id-query'
 import { JsonApiStoreTransformer } from '../transformer/json-api-store-transformer'
 import { JsonApiOrderTransformer } from '../../order/transformer/json-api-order-transformer'
 
@@ -19,7 +19,7 @@ export default class ListStoreController {
         })
 
         let orderJsonApi = null
-        const orderDetail = await this.findOrderByCustomerId.execute(new FindOrderByCustomerIdCommand(customerId))
+        const orderDetail = await this.findOrderByCustomerId.execute(new FindOrderByCustomerIdQuery(customerId))
         if (orderDetail) {
             orderJsonApi = JsonApiOrderTransformer.transform(orderDetail)
         }

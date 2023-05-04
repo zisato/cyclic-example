@@ -8,7 +8,7 @@ export class Product {
     readonly storeId: Identity
     readonly image: Image | null
 
-    constructor({ id, name, categoryId, storeId, image }: { id: Identity, name: string, categoryId: Identity, storeId: Identity, image: Image | null }) {
+    constructor({ id, name, categoryId, storeId, image = null }: { id: Identity, name: string, categoryId: Identity, storeId: Identity, image?: Image | null }) {
         this.id = id
         this.name = name
         this.categoryId = categoryId

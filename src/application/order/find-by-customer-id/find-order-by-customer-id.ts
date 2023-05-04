@@ -3,7 +3,7 @@ import { OrderItem } from '../../../domain/order/order-item'
 import { OrderStatus } from '../../../domain/order/order-status'
 import { OrderRepository } from '../../../domain/order/repository/order-repository'
 import { ProductRepository } from '../../../domain/product/repository/product-repository'
-import { FindOrderByCustomerIdCommand } from './find-order-by-customer-id-command'
+import { FindOrderByCustomerIdQuery } from './find-order-by-customer-id-query'
 
 type OrderItemDetail = {
     productId: string
@@ -19,8 +19,8 @@ export type OrderDetail = {
 export default class FindOrderByCustomerId {
     constructor (private readonly orderRepository: OrderRepository, private readonly productRepository: ProductRepository) {}
 
-    async execute(command: FindOrderByCustomerIdCommand): Promise<OrderDetail | null> {
-        let order = await this.orderRepository.findByCustomerIdAndStatus(command.customerId, OrderStatus.draft)
+    async execute(query: FindOrderByCustomerIdQuery): Promise<OrderDetail | null> {
+        let order = await this.orderRepository.findByCustomerIdAndStatus(query.customerId, OrderStatus.draft)
         if (!order) {
             return null
         }
