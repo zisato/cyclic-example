@@ -4,11 +4,15 @@ import FindStoreBySellerId from '../../../../application/store/find-by-seller-id
 import { FindStoreBySellerIdQuery } from '../../../../application/store/find-by-seller-id/find-store-by-seller-id-query'
 import UpdateStore from '../../../../application/store/update/update-store'
 import { UpdateStoreCommand } from '../../../../application/store/update/update-store-command'
-import { JsonApiStoreTransformer } from '../../transformer/json-api-store-transformer'
+import JsonApiStoreTransformer from '../../transformer/json-api-store-transformer'
 import { UpdateStoreForm } from '../../form/update-store-form'
 
 export default class UpdateStoreController {
-    constructor(private readonly findStoreBySellerId: FindStoreBySellerId, private readonly updateStore: UpdateStore) { }
+    constructor(
+        private readonly findStoreBySellerId: FindStoreBySellerId,
+        private readonly updateStore: UpdateStore,
+        private readonly jsonApiStoreTransformer: JsonApiStoreTransformer
+    ) { }
 
     handle = async (req: Request, res: Response): Promise<void> => {
         const sellerId = await this.getSellerId(req)
@@ -28,7 +32,7 @@ export default class UpdateStoreController {
             return res.redirect('/admin/stores/update')
         }
 
-        const storeJsonApi = JsonApiStoreTransformer.transform(store)
+        const storeJsonApi = this.jsonApiStoreTransformer.transform(store)
 
         res.status(200).render('admin/store/update', {
             store: storeJsonApi

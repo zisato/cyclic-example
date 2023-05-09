@@ -3,23 +3,25 @@ import ListProducts from '../../../../application/product/list/list-products'
 import { ListProductsQuery } from '../../../../application/product/list/list-products-query'
 import FindStoreBySellerId from '../../../../application/store/find-by-seller-id/find-store-by-seller-id'
 import { FindStoreBySellerIdQuery } from '../../../../application/store/find-by-seller-id/find-store-by-seller-id-query'
-import { Product } from '../../../../domain/product/product'
 import { Store } from '../../../../domain/store/store'
-import { JsonApiProductTransformer } from '../../transformer/json-api-product-transformer'
-import { JsonApiStoreTransformer } from '../../../store/transformer/json-api-store-transformer'
+import JsonApiProductTransformer from '../../transformer/json-api-product-transformer'
+import JsonApiStoreTransformer from '../../../store/transformer/json-api-store-transformer'
 
 export default class ListProductsController {
-    constructor(private readonly listProducts: ListProducts, private readonly findStoreBySellerId: FindStoreBySellerId) { }
+    constructor(
+        private readonly listProducts: ListProducts,
+        private readonly findStoreBySellerId: FindStoreBySellerId,
+        private readonly jsonApiProductTransformer: JsonApiProductTransformer,
+        private readonly jsonApiStoreTransformer: JsonApiStoreTransformer
+    ) { }
 
     handle = async (req: Request, res: Response): Promise<void> => {
         const sellerId = this.getSellerId(req)
         const store = await this.getStore(sellerId)
-        const storeJsonApi = JsonApiStoreTransformer.transform(store)
+        const storeJsonApi = this.jsonApiStoreTransformer.transform(store)
 
         const products = await this.listProducts.execute(new ListProductsQuery(store.id.value))
-        const productsJsonApi = products.map((product: Product) => {
-            return JsonApiProductTransformer.transform(product)
-        })
+        const productsJsonApi = this.jsonApiProductTransformer.transformArray(products)
 
         res.status(200).render('admin/product/list', {
             store: storeJsonApi,

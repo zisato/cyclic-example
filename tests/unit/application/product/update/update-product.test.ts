@@ -1,10 +1,8 @@
 import UpdateProduct from '../../../../../src/application/product/update/update-product'
 import { UpdateProductCommand } from '../../../../../src/application/product/update/update-product-command'
-import { Image } from '../../../../../src/domain/product/image'
 import { Product } from '../../../../../src/domain/product/product'
 import { ProductRepository } from '../../../../../src/domain/product/repository/product-repository'
 import { UuidV1 } from '../../../../../src/infrastructure/identity/uuid-v1'
-import { onePixelTransparentPng } from '../../../../helpers/image-mock'
 import { InterfaceMock } from '../../../../helpers/interface-mock'
 
 describe('UpdateProduct unit test suite', () => {
@@ -21,7 +19,7 @@ describe('UpdateProduct unit test suite', () => {
         const name = 'product-name'
         const categoryId = UuidV1.create()
         const storeId = UuidV1.create()
-        const product = new Product({ id, name, categoryId, storeId, image: null })
+        const product = new Product({ id, name, categoryId, storeId, imageFilename: null })
         const newName = 'new-product-name'
         const command = new UpdateProductCommand(id.value, newName)
         stubs.productRepository.get.mockResolvedValue(product)
@@ -39,7 +37,7 @@ describe('UpdateProduct unit test suite', () => {
         const name = 'product-name'
         const categoryId = UuidV1.create()
         const storeId = UuidV1.create()
-        const product = new Product({ id, name, categoryId, storeId, image: null })
+        const product = new Product({ id, name, categoryId, storeId, imageFilename: null })
         const newName = 'new-product-name'
         const command = new UpdateProductCommand(id.value, newName)
         stubs.productRepository.get.mockResolvedValue(product)
@@ -52,7 +50,7 @@ describe('UpdateProduct unit test suite', () => {
             name: 'new-product-name',
             categoryId: categoryId,
             storeId: storeId,
-            image: null
+            imageFilename: null
         })
         expect(stubs.productRepository.save).toHaveBeenCalledTimes(expectedTimes)
         expect(stubs.productRepository.save).toHaveBeenCalledWith(expectedArguments)
@@ -63,8 +61,8 @@ describe('UpdateProduct unit test suite', () => {
         const name = 'product-name'
         const categoryId = UuidV1.create()
         const storeId = UuidV1.create()
-        const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(onePixelTransparentPng, 'base64') })
-        const product = new Product({ id, name, categoryId, storeId, image: image })
+        const imageFilename = 'test-image-filename'
+        const product = new Product({ id, name, categoryId, storeId, imageFilename })
         const newName = 'new-product-name'
         const command = new UpdateProductCommand(id.value, newName)
         stubs.productRepository.get.mockResolvedValue(product)

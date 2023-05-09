@@ -12,7 +12,7 @@ export class AppErrorHandlerConfiguration implements ErrorHandlerConfiguration {
         ]
 
         if (parameters.get<string>('environment') === 'development') {
-            errorRequestHandlers.push(container.get<AppErrorLoggerMiddleware>('appErrorLoggerMiddleware').handle)
+            errorRequestHandlers.unshift(container.get<AppErrorLoggerMiddleware>('appErrorLoggerMiddleware').handle)
         }
 
         return errorRequestHandlers

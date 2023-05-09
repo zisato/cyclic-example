@@ -6,16 +6,20 @@ import FindProductById from '../../../../../../src/application/product/find-by-i
 import UpdateProduct from '../../../../../../src/application/product/update/update-product'
 import { FindProductByIdQuery } from '../../../../../../src/application/product/find-by-id/find-product-by-id-query'
 // import { InvalidJsonSchemaError } from '../../../../../../src/infrastructure/error/invalid-json-schema-error'
-import { Image } from '../../../../../../src/domain/product/image'
+// import { Image } from '../../../../../../src/domain/product/image'
 import { UploadedFile } from 'express-fileupload'
 import { onePixelTransparentPng } from '../../../../../helpers/image-mock'
+import { FileStorageService } from '../../../../../../src/infrastructure/file-storage/file-storage-service'
+import JsonApiProductDetailTransformer from '../../../../../../src/infrastructure/product/transformer/json-api-product-detail-transformer'
 
 describe('UpdateProductController unit test', () => {
   const stubs: {
     request: Partial<Request>
     response: Partial<Response>
     findProductById: Partial<FindProductById>,
-    updateProduct: Partial<UpdateProduct>
+    updateProduct: Partial<UpdateProduct>,
+    fileStorageService: Partial<FileStorageService>,
+    jsonApiProductDetailTransformer: Partial<JsonApiProductDetailTransformer>
   } = {
     request: {
       body: jest.fn()
@@ -36,10 +40,21 @@ describe('UpdateProductController unit test', () => {
     },
     updateProduct: {
       execute: jest.fn()
+    },
+    fileStorageService: {
+      put: jest.fn()
+    },
+    jsonApiProductDetailTransformer: {
+      transform: jest.fn()
     }
   }
 
-  const controller = new UpdateProductController(stubs.findProductById as FindProductById, stubs.updateProduct as UpdateProduct)
+  const controller = new UpdateProductController(
+    stubs.findProductById as FindProductById,
+    stubs.updateProduct as UpdateProduct,
+    stubs.fileStorageService as FileStorageService,
+    stubs.jsonApiProductDetailTransformer as JsonApiProductDetailTransformer
+  )
 
   function getValidRequestBody(name: string): any {
     return {
@@ -56,7 +71,7 @@ describe('UpdateProductController unit test', () => {
       const productId = UuidV1.create()
       const categoryId = UuidV1.create()
       const storeId = UuidV1.create()
-      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, image: null })
+      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, imageFilename: null })
       stubs.request.method = 'GET'
       stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
@@ -78,7 +93,7 @@ describe('UpdateProductController unit test', () => {
       const productId = UuidV1.create()
       const categoryId = UuidV1.create()
       const storeId = UuidV1.create()
-      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, image: null })
+      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, imageFilename: null })
       stubs.request.method = 'GET'
       stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
@@ -100,11 +115,19 @@ describe('UpdateProductController unit test', () => {
       const productId = UuidV1.create()
       const categoryId = UuidV1.create()
       const storeId = UuidV1.create()
-      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, image: null })
+      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, imageFilename: null })
+      const jsonApiProduct = {
+        id: product.id.value,
+        attributes: {
+            name: product.name,
+            image: null
+        }
+      }
       stubs.request.method = 'GET'
       stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
+      stubs.jsonApiProductDetailTransformer.transform = jest.fn().mockReturnValueOnce(jsonApiProduct)
 
       // When
       await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -130,12 +153,19 @@ describe('UpdateProductController unit test', () => {
       const productId = UuidV1.create()
       const categoryId = UuidV1.create()
       const storeId = UuidV1.create()
-      const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(onePixelTransparentPng, 'base64') })
-      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, image: image })
+      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, imageFilename: 'test' })
+      const jsonApiProduct = {
+        id: product.id.value,
+        attributes: {
+            name: product.name,
+            image: 'test'
+        }
+      }
       stubs.request.method = 'GET'
       stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
+      stubs.jsonApiProductDetailTransformer.transform = jest.fn().mockReturnValueOnce(jsonApiProduct)
 
       // When
       await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -147,7 +177,7 @@ describe('UpdateProductController unit test', () => {
           id: productId.value,
           attributes: {
             name: 'product-name',
-            image: product.imageAsDataUrl()
+            image: 'test'
           }
         }
       }]
@@ -163,7 +193,7 @@ describe('UpdateProductController unit test', () => {
       const productId = UuidV1.create()
       const categoryId = UuidV1.create()
       const storeId = UuidV1.create()
-      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, image: null })
+      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, imageFilename: null })
       stubs.request.method = 'POST'
       stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
@@ -187,8 +217,8 @@ describe('UpdateProductController unit test', () => {
       const productId = UuidV1.create()
       const categoryId = UuidV1.create()
       const storeId = UuidV1.create()
-      const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(onePixelTransparentPng, 'base64') })
-      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, image: image })
+      const imageFilename = 'test'
+      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, imageFilename })
       stubs.request.method = 'POST'
       stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)
@@ -203,6 +233,7 @@ describe('UpdateProductController unit test', () => {
         } as unknown as UploadedFile
       }
       stubs.findProductById.execute = jest.fn().mockResolvedValueOnce(product)
+      stubs.fileStorageService.put = jest.fn().mockReturnValueOnce('test')
 
       // When
       await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -211,12 +242,7 @@ describe('UpdateProductController unit test', () => {
       const expected = {
         id: productId,
         name: 'new-product-name',
-        image: {
-          name: 'test',
-          mimeType: 'image/png',
-          size: 0,
-          data: expect.anything()
-        }
+        image: 'test'
       }
       expect(stubs.updateProduct.execute).toHaveBeenCalledTimes(1)
       expect(stubs.updateProduct.execute).toHaveBeenCalledWith(expect.objectContaining(expected))
@@ -228,7 +254,7 @@ describe('UpdateProductController unit test', () => {
       const productId = UuidV1.create()
       const categoryId = UuidV1.create()
       const storeId = UuidV1.create()
-      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId, image: null })
+      const product = new Product({ id: productId, name: 'product-name', categoryId, storeId })
       stubs.request.method = 'POST'
       stubs.request.params = { productId: productId.value }
       stubs.request.body = getValidRequestBody(name)

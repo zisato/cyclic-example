@@ -7,8 +7,8 @@ type JsonApiSeller = {
     }
 }
 
-export class JsonApiSellerTransformer {
-    static transform(seller: Seller): JsonApiSeller {
+export default class JsonApiSellerTransformer {
+    transform(seller: Seller): JsonApiSeller {
         return {
             id: seller.id.value,
             attributes: {

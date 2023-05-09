@@ -14,6 +14,8 @@ import { Category } from '../../../../../../src/domain/category/category'
 import { Identity } from '../../../../../../src/domain/identity/identity'
 import { UploadedFile } from 'express-fileupload'
 import { onePixelTransparentPng } from '../../../../../helpers/image-mock'
+import { FileStorageService } from '../../../../../../src/infrastructure/file-storage/file-storage-service'
+import JsonApiCategoryTransformer from '../../../../../../src/infrastructure/category/transformer/json-api-category-transformer'
 // import { ClassMock } from '../../../../helpers/interface-mock'
 
 describe('CreateProductController unit test', () => {
@@ -22,7 +24,9 @@ describe('CreateProductController unit test', () => {
     response: Partial<Response>
     findStoreBySellerId: Partial<FindStoreBySellerId>,
     createProduct: Partial<CreateProduct>,
-    listCategories: Partial<ListCategories>
+    listCategories: Partial<ListCategories>,
+    fileStorageService: Partial<FileStorageService>,
+    jsonApiCategoryTransformer: Partial<JsonApiCategoryTransformer>
   } = {
     request: {
       body: jest.fn(),
@@ -48,9 +52,21 @@ describe('CreateProductController unit test', () => {
     },
     listCategories: {
       execute: jest.fn()
+    },
+    fileStorageService: {
+      put: jest.fn()
+    },
+    jsonApiCategoryTransformer: {
+      transformArray: jest.fn()
     }
   }
-  const controller = new CreateProductController(stubs.findStoreBySellerId as FindStoreBySellerId, stubs.createProduct as CreateProduct, stubs.listCategories as ListCategories)
+  const controller = new CreateProductController(
+    stubs.findStoreBySellerId as FindStoreBySellerId,
+    stubs.createProduct as CreateProduct,
+    stubs.listCategories as ListCategories,
+    stubs.fileStorageService as FileStorageService,
+    stubs.jsonApiCategoryTransformer as JsonApiCategoryTransformer
+  )
 
   function getValidRequestBody(name: string, categoryId: string): any {
     return {
@@ -104,6 +120,34 @@ describe('CreateProductController unit test', () => {
       expect(stubs.listCategories.execute).toHaveBeenCalledWith(expectedArguments)
     })
 
+    test('Should call jsonApiCategoryTransformer.transformArray method when valid request body', async () => {
+      // Given
+      const sellerId = CreateDemo.FIXTURES.seller.id
+      const name = 'product-name'
+      const categoryId = UuidV1.create()
+      const categories: Category[] = [
+        new Category({ id: categoryId, name: 'category-name' })
+      ]
+      stubs.request.user = { id: sellerId }
+      stubs.request.method = 'GET'
+      stubs.request.body = getValidRequestBody(name, categoryId.value)
+      stubs.listCategories.execute = jest.fn().mockResolvedValueOnce(categories)
+
+      // When
+      await controller.handle(stubs.request as Request, stubs.response as Response)
+
+      // Then
+      const expectedTimes = 1
+      const expectedArguments = [
+        {
+          id: categoryId,
+          name: 'category-name'
+        }
+      ]
+      expect(stubs.jsonApiCategoryTransformer.transformArray).toHaveBeenCalledTimes(expectedTimes)
+      expect(stubs.jsonApiCategoryTransformer.transformArray).toHaveBeenCalledWith(expectedArguments)
+    })
+
     test('Should call res.status method when valid request body', async () => {
       // Given
       const sellerId = CreateDemo.FIXTURES.seller.id
@@ -133,24 +177,38 @@ describe('CreateProductController unit test', () => {
       const categories: Category[] = [
         new Category({ id: categoryId, name: 'category-name' })
       ]
+      const categoriesJsonApi = [
+        {
+          id: categoryId.value,
+          attributes: {
+            name: 'category-name'
+          }
+        }
+      ]
       stubs.request.user = { id: sellerId }
       stubs.request.method = 'GET'
       stubs.request.body = getValidRequestBody(name, categoryId.value)
       stubs.listCategories.execute = jest.fn().mockResolvedValueOnce(categories)
+      stubs.jsonApiCategoryTransformer.transformArray = jest.fn().mockReturnValueOnce(categoriesJsonApi)
 
       // When
       await controller.handle(stubs.request as Request, stubs.response as Response)
 
       // Then
       const expectedTimes = 1
-      const expectedArguments = ['admin/product/create', {
-        categories: [{
-          id: categoryId.value,
-          attributes: {
-            name: 'category-name'
-          }
-        }]
-      }]
+      const expectedArguments = [
+        'admin/product/create',
+        {
+          categories: [
+            {
+              id: categoryId.value,
+              attributes: {
+                name: 'category-name'
+              }
+            }
+          ]
+        }
+      ]
       expect(stubs.response.render).toHaveBeenCalledTimes(expectedTimes)
       expect(stubs.response.render).toHaveBeenCalledWith(...expectedArguments)
     })
@@ -211,6 +269,7 @@ describe('CreateProductController unit test', () => {
       const storeId = UuidV1.create()
       const store = givenAStore(storeId, sellerId)
       stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)
+      stubs.fileStorageService.put = jest.fn().mockReturnValueOnce('test')
       stubs.request.user = { id: sellerId.value }
       stubs.request.method = 'POST'
       stubs.request.body = getValidRequestBody(name, categoryId.value)
@@ -233,12 +292,7 @@ describe('CreateProductController unit test', () => {
         name: 'product-name',
         categoryId: categoryId,
         storeId: storeId,
-        image: expect.objectContaining({
-          name: 'test',
-          mimeType: 'image/png',
-          size: 0,
-          data: expect.anything()
-        })
+        imageFilename: 'test'
       }
       expect(stubs.createProduct.execute).toHaveBeenCalledTimes(1)
       expect(stubs.createProduct.execute).toHaveBeenCalledWith(expect.objectContaining(expected))

@@ -5,7 +5,7 @@ import { OrderRepository } from '../../../domain/order/repository/order-reposito
 import { ProductRepository } from '../../../domain/product/repository/product-repository'
 import { FindOrderByCustomerIdQuery } from './find-order-by-customer-id-query'
 
-type OrderItemDetail = {
+export type OrderItemDetail = {
     productId: string
     name: string
     quantity: number
@@ -42,7 +42,7 @@ export default class FindOrderByCustomerId {
                 productId: product.id.value,
                 name: product.name,
                 quantity: orderItem.quantity,
-                image: product.imageAsDataUrl()
+                image: product.imageFilename
             })
         }
 

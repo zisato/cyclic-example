@@ -1,4 +1,5 @@
-import { OrderDetail } from '../../../application/order/find-by-customer-id/find-order-by-customer-id'
+import { OrderDetail, OrderItemDetail } from '../../../application/order/find-by-customer-id/find-order-by-customer-id'
+import JsonApiOrderItemTransformer from './json-api-order-item-transformer'
 
 type JsonApiOrderItem = {
     productId: string
@@ -7,23 +8,18 @@ type JsonApiOrderItem = {
     image: string | null
 }
 
-type JsonApiOrder = {
+export type JsonApiOrder = {
     id: string
     attributes: {
         items: JsonApiOrderItem[]
     }
 }
 
-export class JsonApiOrderTransformer {
-    static transform(order: OrderDetail): JsonApiOrder {
-        const orderItems = order.items.map((orderItem) => {
-            return {
-                productId: orderItem.productId,
-                name: orderItem.name,
-                image: orderItem.image,
-                quantity: orderItem.quantity
-            }
-        })
+export default class JsonApiOrderTransformer {
+    constructor(private readonly jsonApiOrderItemTransformer: JsonApiOrderItemTransformer) {}
+
+    transform(order: OrderDetail): JsonApiOrder {
+        const orderItems = this.getOrderItems(order.items)
 
         return {
             id: order.id.value,
@@ -31,5 +27,17 @@ export class JsonApiOrderTransformer {
                 items: orderItems
             }
         }
+    }
+
+    private getOrderItems(items: OrderItemDetail[]): JsonApiOrderItem[] {
+        const result: JsonApiOrderItem[] = []
+
+        for (const item of items) {
+            const jsonApiOrderItemDetail = this.jsonApiOrderItemTransformer.transform(item)
+
+            result.push(jsonApiOrderItemDetail)
+        }
+
+        return result
     }
 }

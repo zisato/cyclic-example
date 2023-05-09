@@ -3,12 +3,14 @@ import IndexController from '../../../../src/infrastructure/controller/index-con
 import ListStore from '../../../../src/application/store/list/list-store'
 import { UuidV1 } from '../../../../src/infrastructure/identity/uuid-v1'
 import { Store } from '../../../../src/domain/store/store'
+import JsonApiStoreTransformer from '../../../../src/infrastructure/store/transformer/json-api-store-transformer'
 
 describe('IndexController unit test', () => {
   const stubs: {
     request: Partial<Request>
     response: Partial<Response>
-    listStore: Partial<ListStore>
+    listStore: Partial<ListStore>,
+    jsonApiStoreTransformer: Partial<JsonApiStoreTransformer>
   } = {
     request: {
       body: jest.fn()
@@ -18,9 +20,12 @@ describe('IndexController unit test', () => {
     },
     listStore: {
       execute: jest.fn()
+    },
+    jsonApiStoreTransformer: {
+      transformArray: jest.fn()
     }
   }
-  const controller = new IndexController(stubs.listStore as ListStore)
+  const controller = new IndexController(stubs.listStore as ListStore, stubs.jsonApiStoreTransformer as JsonApiStoreTransformer)
 
   test('Should call listStore.execute method when valid request', async () => {
     // Given
@@ -35,7 +40,38 @@ describe('IndexController unit test', () => {
     expect(stubs.listStore.execute).toHaveBeenCalledWith(expect.objectContaining(expected))
   })
 
-  test('Should call res.redirect method when valid request', async () => {
+  test('Should call jsonApiStoreTransformer.transformArray method when valid request', async () => {
+    // Given
+    const store1Id = UuidV1.create()
+    const store2Id = UuidV1.create()
+    const sellerId = UuidV1.create()
+    const stores = [
+      new Store({ id: store1Id, name: 'store-1-name', sellerId }),
+      new Store({ id: store2Id, name: 'store-2-name', sellerId })
+    ]
+    stubs.listStore.execute = jest.fn().mockResolvedValueOnce(stores)
+
+    // When
+    await controller.handle(stubs.request as Request, stubs.response as Response)
+
+    // Then
+    const expected = [
+      {
+        id: store1Id,
+        name: 'store-1-name',
+        sellerId: sellerId
+      },
+      {
+        id: store2Id,
+        name: 'store-2-name',
+        sellerId: sellerId
+      }
+    ]
+    expect(stubs.jsonApiStoreTransformer.transformArray).toHaveBeenCalledTimes(1)
+    expect(stubs.jsonApiStoreTransformer.transformArray).toHaveBeenCalledWith(expected)
+  })
+
+  test('Should call res.render method when valid request', async () => {
     // Given
     const storeId = UuidV1.create()
     const storeName = 'store-name'
@@ -43,7 +79,16 @@ describe('IndexController unit test', () => {
     const stores = [
       new Store({ id: storeId, name: storeName, sellerId: storeSellerId })
     ]
+    const jsonApiStores = [
+      {
+        id: storeId.value,
+        attributes: {
+          name: 'store-name'
+        }
+      }
+    ]
     stubs.listStore.execute = jest.fn().mockResolvedValueOnce(stores)
+    stubs.jsonApiStoreTransformer.transformArray = jest.fn().mockReturnValueOnce(jsonApiStores)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -57,9 +102,9 @@ describe('IndexController unit test', () => {
           {
             id: storeId.value,
             attributes: {
-                name: 'store-name'
+              name: 'store-name'
             }
-        }
+          }
         ]
       }
     ]

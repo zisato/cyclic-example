@@ -54,7 +54,7 @@ export default class FindOrdersByStoreId {
                 productId: product.id.value,
                 name: product.name,
                 quantity: orderItem.quantity,
-                image: product.imageAsDataUrl()
+                image: product.imageFilename
             })
         }
 

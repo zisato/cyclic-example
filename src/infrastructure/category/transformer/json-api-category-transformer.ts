@@ -7,8 +7,14 @@ type JsonApiCategory = {
     }
 }
 
-export class JsonApiCategoryTransformer {
-    static transform(category: Category): JsonApiCategory {
+export default class JsonApiCategoryTransformer {
+    transformArray(categories: Category[]): JsonApiCategory[] {
+        return categories.map((category: Category) => {
+            return this.transform(category)
+        })
+    }
+
+    transform(category: Category): JsonApiCategory {
         return {
             id: category.id.value,
             attributes: {

@@ -12,7 +12,7 @@ export default class UpdateProduct {
         }
 
         if (command.image !== undefined) {
-            product = product.changeImage(command.image)
+            product = product.changeImageFilename(command.image)
         }
 
         this.productRepository.save(product)

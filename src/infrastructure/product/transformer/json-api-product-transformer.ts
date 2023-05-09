@@ -4,17 +4,21 @@ type JsonApiProduct = {
     id: string
     attributes: {
         name: string
-        image: string | null
     }
 }
 
-export class JsonApiProductTransformer {
-    static transform(product: Product): JsonApiProduct {
+export default class JsonApiProductTransformer {
+    transformArray(products: Product[]): JsonApiProduct[] {
+        return products.map((product: Product) => {
+            return this.transform(product)
+        })
+    }
+
+    transform(product: Product): JsonApiProduct {
         return {
             id: product.id.value,
             attributes: {
-                name: product.name,
-                image: product.imageAsDataUrl()
+                name: product.name
             }
         }
     }

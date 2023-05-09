@@ -1,6 +1,5 @@
-import { Request } from 'express'
-import { Form } from '../../form/form'
-import joi, { ValidationError } from 'joi'
+import joi from 'joi'
+import { AbstractForm } from '../../form/abstract-form'
 
 type AddItemFormData = {
     attributes: {
@@ -11,39 +10,9 @@ type AddItemFormData = {
     }
 }
 
-export class AddItemForm implements Form<AddItemFormData> {
-    private validationError: ValidationError | null = null
-    private data: AddItemFormData | null = null
-
-    async handleRequest(request: Request): Promise<void> {
-        const validationResult = this.getValidationBodyResult(request.body)
-        if (validationResult.error !== undefined) {
-            this.validationError = validationResult.error
-
-            return
-        }
-
-        this.data = validationResult.value
-    }
-
-    isValid(): boolean {
-        return this.validationError === null
-    }
-
-    getData(): AddItemFormData {
-        if (this.data === null) {
-            throw new Error('Form not handled')
-        }
-
-        return this.data
-    }
-
-    getError(): ValidationError | null {
-        return this.validationError
-    }
-
-    private getValidationBodyResult(data: any): joi.ValidationResult<AddItemFormData> {
-        const schema = joi.object({
+export class AddItemForm extends AbstractForm<AddItemFormData> {
+    getValidationBodySchema(): joi.ObjectSchema<AddItemFormData> {
+        return joi.object({
             attributes: joi.object({
                 product: joi.object({
                     id: joi.string().required(),
@@ -51,7 +20,5 @@ export class AddItemForm implements Form<AddItemFormData> {
                 }).required()
             }).required(),
         })
-
-        return schema.validate(data)
     }
 }

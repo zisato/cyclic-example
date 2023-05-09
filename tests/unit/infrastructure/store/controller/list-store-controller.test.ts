@@ -5,13 +5,17 @@ import ListStoreController from '../../../../../src/infrastructure/store/control
 import { UuidV1 } from '../../../../../src/infrastructure/identity/uuid-v1'
 import { Order } from '../../../../../src/domain/order/order'
 import FindOrderByCustomerId from '../../../../../src/application/order/find-by-customer-id/find-order-by-customer-id'
+import JsonApiStoreTransformer from '../../../../../src/infrastructure/store/transformer/json-api-store-transformer'
+import JsonApiOrderTransformer from '../../../../../src/infrastructure/order/transformer/json-api-order-transformer'
 
 describe('ListStoreController unit test', () => {
   const stubs: {
     request: Partial<Request>
     response: Partial<Response>
     listStore: Partial<ListStore>
-    findOrderByCustomerId: Partial<FindOrderByCustomerId>
+    findOrderByCustomerId: Partial<FindOrderByCustomerId>,
+    jsonApiStoreTransformer: Partial<JsonApiStoreTransformer>,
+    jsonApiOrderTransformer: Partial<JsonApiOrderTransformer>
   } = {
     request: {
       body: jest.fn(),
@@ -30,9 +34,20 @@ describe('ListStoreController unit test', () => {
     },
     findOrderByCustomerId: {
       execute: jest.fn()
+    },
+    jsonApiStoreTransformer: {
+      transformArray: jest.fn()
+    },
+    jsonApiOrderTransformer: {
+      transform: jest.fn()
     }
   }
-  const controller = new ListStoreController(stubs.listStore as ListStore, stubs.findOrderByCustomerId as FindOrderByCustomerId)
+  const controller = new ListStoreController(
+    stubs.listStore as ListStore,
+    stubs.findOrderByCustomerId as FindOrderByCustomerId,
+    stubs.jsonApiStoreTransformer as JsonApiStoreTransformer,
+    stubs.jsonApiOrderTransformer as JsonApiOrderTransformer
+  )
 
   test('Should call listStore.execute method when valid request', async () => {
     // Given
@@ -80,9 +95,25 @@ describe('ListStoreController unit test', () => {
     const stores = [
       new Store({ id: storeId, name: storeName, sellerId: storeSellerId })
     ]
+    const jsonApiStores = [
+      {
+        id: storeId.value,
+        attributes: {
+          name: storeName
+        }
+      }
+    ]
+    const jsonApiOrderDetail = {
+      id: order.id.value,
+      attributes: {
+        items: []
+      }
+    }
     stubs.request.user = { id: customerId.value }
     stubs.listStore.execute = jest.fn().mockResolvedValueOnce(stores)
     stubs.findOrderByCustomerId.execute = jest.fn().mockResolvedValueOnce(order)
+    stubs.jsonApiStoreTransformer.transformArray = jest.fn().mockReturnValueOnce(jsonApiStores)
+    stubs.jsonApiOrderTransformer.transform = jest.fn().mockReturnValueOnce(jsonApiOrderDetail)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)

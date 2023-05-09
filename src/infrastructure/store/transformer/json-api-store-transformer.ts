@@ -7,8 +7,14 @@ type JsonApiStore = {
     }
 }
 
-export class JsonApiStoreTransformer {
-    static transform(store: Store): JsonApiStore {
+export default class JsonApiStoreTransformer {
+    transformArray(stores: Store[]): JsonApiStore[] {
+        return stores.map((store: Store) => {
+            return this.transform(store)
+        })
+    }
+
+    transform(store: Store): JsonApiStore {
         return {
             id: store.id.value,
             attributes: {

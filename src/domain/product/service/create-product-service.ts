@@ -3,7 +3,6 @@ import { InvalidArgumentError } from '../../error/invalid-argument-error'
 import { ModelNotFoundError } from '../../error/model-not-found-error'
 import { Identity } from '../../identity/identity'
 import { StoreRepository } from '../../store/repository/store-repository'
-import { Image } from '../image'
 import { Product } from '../product'
 import { ProductRepository } from '../repository/product-repository'
 
@@ -14,13 +13,13 @@ export class CreateProductService {
         private readonly storeRepository: StoreRepository
     ) { }
 
-    async create(id: Identity, name: string, categoryId: Identity, storeId: Identity, image?: Image): Promise<void> {
+    async create(id: Identity, name: string, categoryId: Identity, storeId: Identity, imageFilename?: string): Promise<void> {
         await this.ensureCategoryIdExists(categoryId)
         await this.ensureStoreIdExists(storeId)
         await this.ensureProductIdNotExists(id)
-        const imageFile = image ?? null
+        const imageFilenameValue = imageFilename ?? null
 
-        const product = new Product({ id, name, categoryId, storeId, image: imageFile })
+        const product = new Product({ id, name, categoryId, storeId, imageFilename: imageFilenameValue })
 
         await this.productRepository.save(product)
     }

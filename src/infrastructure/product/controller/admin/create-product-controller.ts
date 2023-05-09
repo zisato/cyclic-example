@@ -6,18 +6,20 @@ import { FindStoreBySellerIdQuery } from '../../../../application/store/find-by-
 import { UuidV1 } from '../../../identity/uuid-v1'
 import ListCategories from '../../../../application/category/list/list-categories'
 import { ListCategoriesQuery } from '../../../../application/category/list/list-categories-query'
-import { Category } from '../../../../domain/category/category'
 import { Identity } from '../../../../domain/identity/identity'
 import { CreateProductForm } from '../../form/create-product-form'
-import { Image } from '../../../../domain/product/image'
+import JsonApiCategoryTransformer from '../../../category/transformer/json-api-category-transformer'
+import { UploadedFile } from 'express-fileupload'
+import { FileStorageService } from '../../../file-storage/file-storage-service'
 import { File } from '../../../file-storage/file'
-import { JsonApiCategoryTransformer } from '../../../category/transformer/json-api-category-transformer'
 
 export default class CreateProductController {
   constructor(
     private readonly findStoreBySellerId: FindStoreBySellerId,
     private readonly createProduct: CreateProduct,
     private readonly listCategories: ListCategories,
+    private readonly fileStorageService: FileStorageService,
+    private readonly jsonApiCategoryTransformer: JsonApiCategoryTransformer
   ) { }
 
   handle = async (req: Request, res: Response): Promise<void> => {
@@ -30,13 +32,14 @@ export default class CreateProductController {
         const sellerId = this.getSellerId(req)
         const storeId = await this.getStoreId(sellerId)
         const createProductFormData = createProductForm.getData()
-        const image = this.getImage(createProductFormData.attributes.image)
+        const imageFilename = this.getImageFilename(createProductFormData.attributes.image)
+
         const command = new CreateProductCommand(
           UuidV1.create().value,
           createProductFormData.attributes.name,
           createProductFormData.relationships.category.id,
           storeId.value,
-          image
+          imageFilename
         )
   
         await this.createProduct.execute(command)
@@ -46,9 +49,7 @@ export default class CreateProductController {
     }
 
     const categories = await this.listCategories.execute(new ListCategoriesQuery())
-    const categoriesJsonApi = categories.map((category: Category) => {
-      return JsonApiCategoryTransformer.transform(category)
-    })
+    const categoriesJsonApi = this.jsonApiCategoryTransformer.transformArray(categories)
 
     res.status(200).render('admin/product/create', {
       categories: categoriesJsonApi
@@ -69,12 +70,18 @@ export default class CreateProductController {
     return store.id
   }
 
-  private getImage(imageFile?: File): Image | undefined {
-    let image: Image | undefined = undefined
-    if (imageFile) {
-      image = new Image({ name: imageFile.name, mimeType: imageFile.mimeType, size: imageFile.size, data: imageFile.data })
+  private getImageFilename(uploadedFile?: UploadedFile): string | undefined {
+    if (!uploadedFile) {
+      return
     }
 
-    return image
+    const file = new File({
+      name: uploadedFile.name,
+      mimeType: uploadedFile.mimetype,
+      size: uploadedFile.size,
+      data: uploadedFile.data
+    })
+
+    return this.fileStorageService.put(file)    
   }
 }

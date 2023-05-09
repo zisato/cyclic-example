@@ -8,15 +8,18 @@ import { UuidV1 } from '../../../../../../src/infrastructure/identity/uuid-v1'
 import { FindStoreBySellerIdQuery } from '../../../../../../src/application/store/find-by-seller-id/find-store-by-seller-id-query'
 import CreateDemo from '../../../../../../src/application/demo/create/create-demo'
 import { Store } from '../../../../../../src/domain/store/store'
-import { Image } from '../../../../../../src/domain/product/image'
-import { onePixelTransparentPng } from '../../../../../helpers/image-mock'
+import JsonApiProductDetailTransformer from '../../../../../../src/infrastructure/product/transformer/json-api-product-detail-transformer'
+import JsonApiStoreTransformer from '../../../../../../src/infrastructure/store/transformer/json-api-store-transformer'
+import JsonApiProductTransformer from '../../../../../../src/infrastructure/product/transformer/json-api-product-transformer'
 
 describe('ListProductsController unit test', () => {
   const stubs: {
     request: Partial<Request>
     response: Partial<Response>
     listProducts: Partial<ListProducts>,
-    findStoreBySellerId: Partial<FindStoreBySellerId>
+    findStoreBySellerId: Partial<FindStoreBySellerId>,
+    jsonApiProductTransformer: Partial<JsonApiProductDetailTransformer>,
+    jsonApiStoreTransformer: Partial<JsonApiStoreTransformer>,
   } = {
     request: {
       user: {}
@@ -37,10 +40,21 @@ describe('ListProductsController unit test', () => {
     },
     findStoreBySellerId: {
       execute: jest.fn()
+    },
+    jsonApiProductTransformer: {
+      transformArray: jest.fn()
+    },
+    jsonApiStoreTransformer: {
+      transform: jest.fn()
     }
   }
 
-  const controller = new ListProductsController(stubs.listProducts as ListProducts, stubs.findStoreBySellerId as FindStoreBySellerId)
+  const controller = new ListProductsController(
+    stubs.listProducts as ListProducts,
+    stubs.findStoreBySellerId as FindStoreBySellerId,
+    stubs.jsonApiProductTransformer as JsonApiProductTransformer,
+    stubs.jsonApiStoreTransformer as JsonApiStoreTransformer
+  )
 
   test('Should call findStoreBySellerId.execute method when valid request body', async () => {
     // Given
@@ -103,14 +117,37 @@ describe('ListProductsController unit test', () => {
     const categoryId = UuidV1.create()
     const storeId = UuidV1.create()
     const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
-    const image = new Image({ name: 'test', mimeType: 'image/png', size: 0, data: Buffer.from(onePixelTransparentPng, 'base64') })
     const products = [
-      new Product({ id: product1Id, name: 'product-1-name', categoryId: categoryId, storeId: storeId, image: null }),
-      new Product({ id: product2Id, name: 'product-2-name', categoryId: categoryId, storeId: storeId, image: image })
+      new Product({ id: product1Id, name: 'product-1-name', categoryId: categoryId, storeId: storeId, imageFilename: null }),
+      new Product({ id: product2Id, name: 'product-2-name', categoryId: categoryId, storeId: storeId, imageFilename: 'test' })
+    ]
+    const jsonApiStore = {
+      id: storeId.value,
+      attributes: {
+        name: 'store-name'
+      }
+    }
+    const jsonApiProducts = [
+      {
+        id: product1Id.value,
+        attributes: {
+            name: 'product-1-name',
+            image: null
+        }
+      },
+      {
+        id: product2Id.value,
+        attributes: {
+            name: 'product-2-name',
+            image: 'test'
+        }
+      }
     ]
     stubs.request.user = { id: sellerId.value }
     stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValue(store)
     stubs.listProducts.execute = jest.fn().mockResolvedValue(products)
+    stubs.jsonApiStoreTransformer.transform = jest.fn().mockReturnValueOnce(jsonApiStore)
+    stubs.jsonApiProductTransformer.transformArray = jest.fn().mockReturnValueOnce(jsonApiProducts)
 
     // When
     await controller.handle(stubs.request as Request, stubs.response as Response)
@@ -138,7 +175,7 @@ describe('ListProductsController unit test', () => {
             id: product2Id.value,
             attributes: {
               name: 'product-2-name',
-              image: `data:image/png;base64, ${onePixelTransparentPng}`
+              image: 'test'
             }
           }
         ]

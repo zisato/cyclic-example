@@ -6,6 +6,7 @@ import FindStoreBySellerId from '../../../../../../src/application/store/find-by
 import { Store } from '../../../../../../src/domain/store/store'
 import CreateDemo from '../../../../../../src/application/demo/create/create-demo'
 import { FindStoreBySellerIdQuery } from '../../../../../../src/application/store/find-by-seller-id/find-store-by-seller-id-query'
+import JsonApiStoreTransformer from '../../../../../../src/infrastructure/store/transformer/json-api-store-transformer'
 
 describe('UpdateStoreController unit test', () => {
   const stubs: {
@@ -13,6 +14,7 @@ describe('UpdateStoreController unit test', () => {
     response: Partial<Response>
     findStoreBySellerId: Partial<FindStoreBySellerId>,
     updateStore: Partial<UpdateStore>
+    jsonApiStoreTransformer: Partial<JsonApiStoreTransformer>
   } = {
     request: {
       body: {},
@@ -34,10 +36,17 @@ describe('UpdateStoreController unit test', () => {
     },
     updateStore: {
       execute: jest.fn()
+    },
+    jsonApiStoreTransformer: {
+      transform: jest.fn()
     }
   }
 
-  const controller = new UpdateStoreController(stubs.findStoreBySellerId as FindStoreBySellerId, stubs.updateStore as UpdateStore)
+  const controller = new UpdateStoreController(
+    stubs.findStoreBySellerId as FindStoreBySellerId,
+    stubs.updateStore as UpdateStore,
+    stubs.jsonApiStoreTransformer as JsonApiStoreTransformer
+  )
 
   function getValidRequestBody(name: string): any {
     return {
@@ -69,6 +78,31 @@ describe('UpdateStoreController unit test', () => {
       expect(stubs.findStoreBySellerId.execute).toHaveBeenCalledWith(expectedArguments)
     })
 
+    test('Should call jsonApiStoreTransformer.transform method when valid request body', async () => {
+      // Given
+      const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
+      const name = 'new-store-name'
+      const storeId = UuidV1.create()
+      const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
+      stubs.request.user = { id: sellerId.value }
+      stubs.request.method = 'GET'
+      stubs.request.body = getValidRequestBody(name)
+      stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)
+
+      // When
+      await controller.handle(stubs.request as Request, stubs.response as Response)
+
+      // Then
+      const expectedTimes = 1
+      const expectedArguments = {
+        id: storeId,
+        name: 'store-name',
+        sellerId
+      }
+      expect(stubs.jsonApiStoreTransformer.transform).toHaveBeenCalledTimes(expectedTimes)
+      expect(stubs.jsonApiStoreTransformer.transform).toHaveBeenCalledWith(expectedArguments)
+    })
+
     test('Should call res.status method when valid request body', async () => {
       // Given
       const sellerId = new UuidV1(CreateDemo.FIXTURES.seller.id)
@@ -96,10 +130,17 @@ describe('UpdateStoreController unit test', () => {
       const name = 'new-store-name'
       const storeId = UuidV1.create()
       const store = new Store({ id: storeId, name: 'store-name', sellerId: sellerId })
+      const storeJsonApi = {
+        id: storeId.value,
+        attributes: {
+          name: 'store-name'
+        }
+      }
       stubs.request.user = { id: sellerId.value }
       stubs.request.method = 'GET'
       stubs.request.body = getValidRequestBody(name)
       stubs.findStoreBySellerId.execute = jest.fn().mockResolvedValueOnce(store)
+      stubs.jsonApiStoreTransformer.transform = jest.fn().mockReturnValueOnce(storeJsonApi)
 
       // When
       await controller.handle(stubs.request as Request, stubs.response as Response)
