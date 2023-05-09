@@ -10,6 +10,10 @@ export class AppMiddlewareConfiguration implements MiddlewareConfiguration {
     getMiddlewaresConfiguration(_container: Container, parameters: Parameters): RequestHandler[] {
         return [
             express.static(parameters.get<string>('express.middlewares.static.dir')),
+            fileUpload({ parseNested: true }),
+            cors(),
+            express.json(),
+            express.urlencoded({ extended: true }),
             methodOverride((req, _res) => {
                 if (req.method === 'POST' && req.body && typeof req.body === 'object' && '_method' in req.body) {
                     const method = req.body._method
@@ -17,11 +21,7 @@ export class AppMiddlewareConfiguration implements MiddlewareConfiguration {
 
                     return method
                 }
-            }),
-            fileUpload({ parseNested: true }),
-            cors(),
-            express.json(),
-            express.urlencoded({ extended: true })
+            })
         ]
     }
 }
