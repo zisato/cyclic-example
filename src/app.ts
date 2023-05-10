@@ -9,10 +9,10 @@ export class App extends SimpleKernel {
     constructor() {
         super({
             containerConfiguration: new AppContainerConfiguration(),
-            middlewareLoader: new AppMiddlewareConfiguration(),
-            routerLoader: new AppRouterConfiguration(),
-            errorHandlerLoader: new AppErrorHandlerConfiguration(),
-            viewEngineLoader: new AppViewEngineConfiguration()
+            middlewareConfiguration: new AppMiddlewareConfiguration(),
+            routerConfiguration: new AppRouterConfiguration(),
+            errorHandlerConfiguration: new AppErrorHandlerConfiguration(),
+            viewConfiguration: new AppViewEngineConfiguration()
         })
     }
 }

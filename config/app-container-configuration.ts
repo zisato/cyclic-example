@@ -1,7 +1,6 @@
-import { AwilixContainer, InjectionModeType, LifetimeType, aliasTo, asClass, asValue } from 'awilix'
+import { AwilixContainer, InjectionModeType, LifetimeType, aliasTo, asClass } from 'awilix'
 import { Parameters } from '../src/simple-kernel/parameters/parameters'
 import { ContainerConfiguration } from '../src/simple-kernel/configuration/container-configuration'
-import CyclicDB from '@cyclic.sh/dynamodb'
 import AdminListProductsController from '../src/infrastructure/product/controller/admin/list-products-controller'
 import ListProductsController from '../src/infrastructure/product/controller/list-products-controller'
 import AppErrorHandlerMiddleware from '../src/infrastructure/express/middleware/app-error-handler-middleware'
@@ -23,7 +22,7 @@ export class AppContainerConfiguration implements ContainerConfiguration {
         })
 
         container.register({
-            cyclicDB: asValue(CyclicDB('long-lime-whale-garbCyclicDB')),
+            // cyclicDB: asValue(CyclicDB('long-lime-whale-garbCyclicDB')),
             // s3Client: asClass(S3).inject(() => ({
             //     configuration: {}
             // })),

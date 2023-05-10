@@ -31,37 +31,37 @@ export class SimpleKernel {
     constructor(
         {
             containerConfiguration,
-            middlewareLoader,
-            routerLoader,
-            errorHandlerLoader,
-            viewEngineLoader
+            middlewareConfiguration,
+            routerConfiguration,
+            errorHandlerConfiguration,
+            viewConfiguration
         }:
             {
                 containerConfiguration?: ContainerConfiguration;
-                middlewareLoader?: MiddlewareConfiguration;
-                routerLoader?: RouterConfiguration;
-                errorHandlerLoader?: ErrorHandlerConfiguration;
-                viewEngineLoader?: ViewConfiguration
+                middlewareConfiguration?: MiddlewareConfiguration;
+                routerConfiguration?: RouterConfiguration;
+                errorHandlerConfiguration?: ErrorHandlerConfiguration;
+                viewConfiguration?: ViewConfiguration
             }) {
         this.containerConfiguration = containerConfiguration ?? {
             configureContainer(_container: AwilixContainerBase, _parameters: Parameters): void {}
         }
-        this.middlewareConfiguration = middlewareLoader ?? {
-            getMiddlewaresConfiguration(_container: Container): RequestHandler[] {
+        this.middlewareConfiguration = middlewareConfiguration ?? {
+            getMiddlewaresConfiguration(_container: Container, _parameters: Parameters): RequestHandler[] {
                 return []
             }
         }
-        this.routerConfiguration = routerLoader ?? {
+        this.routerConfiguration = routerConfiguration ?? {
             getRoutersConfiguration(_container: Container): Router[] {
                 return []
             }
         }
-        this.errorHandlerConfiguration = errorHandlerLoader ?? {
+        this.errorHandlerConfiguration = errorHandlerConfiguration ?? {
             getErrorHandlersConfiguration(_container: Container): ErrorRequestHandler[] {
                 return []
             }
         }
-        this.viewConfiguration = viewEngineLoader ?? {
+        this.viewConfiguration = viewConfiguration ?? {
             getViewConfiguration(): ViewEngineConfiguration | undefined {
                 return undefined
             }
