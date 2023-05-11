@@ -1,16 +1,18 @@
 import { Seller } from '../../../domain/seller/seller'
 import { SellerRepository } from '../../../domain/seller/repository/seller-repository'
-import CyclicDB from '@cyclic.sh/dynamodb'
-import CyclicItem from '@cyclic.sh/dynamodb/dist/cy_db_item'
+// import CyclicDB from '@cyclic.sh/dynamodb'
+// import CyclicItem from '@cyclic.sh/dynamodb/dist/cy_db_item'
 import { Identity } from '../../../domain/identity/identity'
-import { UuidV1 } from '../../identity/uuid-v1'
+// import { UuidV1 } from '../../identity/uuid-v1'
 
 export default class DynamodbSellerRepository implements SellerRepository {
-    private readonly collectionName = 'seller'
+    // private readonly collectionName = 'seller'
 
-    constructor(private readonly cyclicDB: typeof CyclicDB) {}
+    // constructor(private readonly cyclicDB: typeof CyclicDB) {}
 
     async find(): Promise<Seller[]> {
+        return []
+        /*
         const collection = this.cyclicDB.collection(this.collectionName)
         const results: Seller[] = []
         const dbResults = (await collection.list()).results
@@ -26,15 +28,20 @@ export default class DynamodbSellerRepository implements SellerRepository {
         }
 
         return results
+        */
     }
 
-    async exists (id: Identity): Promise<boolean> {
+    async exists (_id: Identity): Promise<boolean> {
+        return false
+        /*
         const collection = this.cyclicDB.collection(this.collectionName)
 
         return await collection.get(id.value) !== null
+        */
     }
 
-    async save (seller: Seller): Promise<void> {
+    async save (_seller: Seller): Promise<void> {
+        /*
         const collection = this.cyclicDB.collection(this.collectionName)
 
         await collection.set(
@@ -44,5 +51,6 @@ export default class DynamodbSellerRepository implements SellerRepository {
             },
             {}
         )
+        */
     }
 }
