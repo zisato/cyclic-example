@@ -6,10 +6,14 @@ import { Identity } from '../../../../../../src/domain/identity/identity'
 import CreateDemo from '../../../../../../src/application/demo/create/create-demo'
 import { ProductRepository } from '../../../../../../src/domain/product/repository/product-repository'
 import { Product } from '../../../../../../src/domain/product/product'
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { mockClient } from 'aws-sdk-client-mock'
+import { onePixelTransparentPng } from '../../../../../helpers/image-mock'
 
 describe('Update Product acceptance test', () => {
     let server: Server | null = null
     const app = new App()
+    const s3Mock = mockClient(S3Client)
 
     beforeEach(() => {
         app.boot()
@@ -76,7 +80,7 @@ describe('Update Product acceptance test', () => {
             expect(response.statusCode).toEqual(expectedStatusCode)
         })
 
-        test('Changes are persisted in repository when updated', async () => {
+        test('Name change is persisted in repository when updated', async () => {
             // Given
             const productId = UuidV1.create()
             const categoryId = CreateDemo.FIXTURES.categories[0].id
@@ -93,6 +97,27 @@ describe('Update Product acceptance test', () => {
             const productRepository = app.getContainer().get<ProductRepository>('productRepository')
             const product = await productRepository.get(productId)
             expect(product.name).toEqual(expectedName)
+        })
+
+        test('ImageFilename change is persisted in repository when updated', async () => {
+            // Given
+            const productId = UuidV1.create()
+            const categoryId = CreateDemo.FIXTURES.categories[0].id
+            const storeId = CreateDemo.FIXTURES.store.id
+            await givenExistingProduct(productId, new UuidV1(categoryId), new UuidV1(storeId))
+            const route = givenRoute(productId.value)
+            s3Mock.on(PutObjectCommand).resolves({})
+  
+            // When
+            await request(server)
+              .post(route)
+              .attach('attributes.image', Buffer.from(onePixelTransparentPng, 'base64'))
+              .set('Content-Type', 'multipart/form-data')
+
+            // Then
+            const productRepository = app.getContainer().get<ProductRepository>('productRepository')
+            const product = await productRepository.get(productId)
+            expect(typeof product.imageFilename).toBe('string')
         })
 
         test('When not existing product id returns 404 status code', async () => {

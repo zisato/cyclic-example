@@ -8,5 +8,8 @@ module.exports = {
         path.join(__dirname, '..', 'build', 'src', 'application', '**', '*.js')
       ]
     }
-  }
+  },
+  s3: {
+    bucketName: process.env.CYCLIC_BUCKET_NAME
+  },
 }

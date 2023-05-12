@@ -9,6 +9,9 @@ module.exports = {
       injectionMode: 'CLASSIC'
     }
   },
+  s3: {
+    bucketName: 'default-bucket-name'
+  },
   express: {
     port: process.env.HTTP_PORT,
     middlewares: {

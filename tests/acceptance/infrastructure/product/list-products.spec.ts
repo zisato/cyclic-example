@@ -9,19 +9,25 @@ import { ProductRepository } from '../../../../src/domain/product/repository/pro
 import { StoreRepository } from '../../../../src/domain/store/repository/store-repository'
 import { Store } from '../../../../src/domain/store/store'
 import { UuidV1 } from '../../../../src/infrastructure/identity/uuid-v1'
+import { mockClient } from 'aws-sdk-client-mock'
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { onePixelTransparentPng } from '../../../helpers/image-mock'
+import { Readable } from 'stream'
+import { sdkStreamMixin } from '@aws-sdk/util-stream-node'
 
 describe('List products acceptance test', () => {
   let server: Server | null = null
   const app = new App()
+  const s3Mock = mockClient(S3Client)
 
   beforeAll(async () => {
     app.boot()
     const parameters = app.getParameters()
-    server = await app.startServer(parameters.get<number>('express.port'))
+    server = app.startServer(parameters.get<number>('express.port'))
   })
 
   afterAll(async () => {
-    await app.shutdown()
+    app.shutdown()
     server = null
   })
 
@@ -41,18 +47,32 @@ describe('List products acceptance test', () => {
     await storeRepository.save(new Store({ id: new UuidV1(id), name, sellerId: new UuidV1(sellerId) }))
   }
 
-  async function givenExistingProduct(id: string, categoryId: string, storeId: string): Promise<void> {
+  async function givenExistingProduct(id: string, categoryId: string, storeId: string, imageFilename: string | null = null): Promise<void> {
     const productRepository = app.getContainer().get<ProductRepository>('productRepository')
 
-    await productRepository.save(new Product({ id: new UuidV1(id), name: 'product-name', categoryId: new UuidV1(categoryId), storeId: new UuidV1(storeId), imageFilename: null }))
+    await productRepository.save(new Product({ id: new UuidV1(id), name: 'product-name', categoryId: new UuidV1(categoryId), storeId: new UuidV1(storeId), imageFilename }))
   }
 
   test('When valid request returns 200 status code', async () => {
     // Given
+    const imageFilename = 'test-image-filename'
     const route = givenRoute(CreateDemo.FIXTURES.store.id)
     await givenExistingStore(CreateDemo.FIXTURES.store.id, 'store-name', CreateDemo.FIXTURES.seller.id)
     await givenExistingCategory(CreateDemo.FIXTURES.categories[0].id, 'category-name')
-    await givenExistingProduct(CreateDemo.FIXTURES.products[0].id, CreateDemo.FIXTURES.categories[0].id, CreateDemo.FIXTURES.store.id)
+    await givenExistingProduct(CreateDemo.FIXTURES.products[0].id, CreateDemo.FIXTURES.categories[0].id, CreateDemo.FIXTURES.store.id, imageFilename)
+    const stream = new Readable()
+    stream.push(onePixelTransparentPng)
+    stream.push(null)
+    const sdkStream = sdkStreamMixin(stream);
+    const getObjectCommandOutput = {
+      Body: sdkStream,
+      Metadata: {
+        name: 'filename',
+        mimeType: 'image/png',
+        size: stream.readableLength.toString()
+      }
+    }
+    s3Mock.on(GetObjectCommand).resolves(getObjectCommandOutput)
 
     // When
     const response = await request(server).get(route).send()
