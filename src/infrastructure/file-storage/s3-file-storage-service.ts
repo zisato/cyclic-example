@@ -18,13 +18,13 @@ export class S3FileStorageService implements FileStorageService {
 
         const metadata = result.Metadata ?? {}
 
-        if (!metadata.name || !metadata.mimeType || !metadata.size) {
+        if (!metadata.name || !metadata.mimetype || !metadata.size) {
             throw new Error('Missing metadata keys')
         }
 
         return new File({
             name: metadata.name,
-            mimeType: metadata.mimeType,
+            mimeType: metadata.mimetype,
             size: Number.parseInt(metadata.size),
             data: Buffer.from(await result.Body.transformToString())
         })
@@ -39,7 +39,7 @@ export class S3FileStorageService implements FileStorageService {
             Key: randomFilename,
             Metadata: {
                 size: file.size.toString(),
-                mimeType: file.mimeType,
+                mimetype: file.mimeType,
                 name: file.name
             }
         })

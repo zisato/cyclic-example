@@ -10,7 +10,9 @@ module.exports = {
     }
   },
   s3: {
-    bucketName: 'default-bucket-name'
+    bucketName: 'default-bucket-name',
+    endpoint: 'http://localstack:4566',
+    forcePathStyle: true
   },
   express: {
     port: process.env.HTTP_PORT,

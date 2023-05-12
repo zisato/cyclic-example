@@ -24,12 +24,15 @@ export class AppContainerConfiguration implements ContainerConfiguration {
         container.register({
             // cyclicDB: asValue(CyclicDB('long-lime-whale-garbCyclicDB')),
             s3Client: asClass(S3).inject(() => ({
-                configuration: {}
+                configuration: {
+                    endpoint: parameters.get<string>('s3.endpoint'),
+                    forcePathStyle: parameters.get<boolean>('s3.forcePathStyle')
+                }
             })),
-            // fileStorageService: aliasTo('inMemoryFileStorageService'),
             fileStorageService: asClass(S3FileStorageService).inject(() => ({
                 bucketName: parameters.get<string>('s3.bucketName')
             })),
+            // fileStorageService: aliasTo('inMemoryFileStorageService'),
             adminListProductsController: asClass(AdminListProductsController),
             listProductsController: asClass(ListProductsController),
             productRepository: aliasTo('inMemoryProductRepository'),

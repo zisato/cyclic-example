@@ -12,7 +12,23 @@ services:
       - AWS_SESSION_TOKEN=""
     ports:
       - 3000:3000
+    links:
+      - localstack
     working_dir: /src
     volumes:
       - ./:/src
     command: npm run dev
+
+  localstack:
+    image: localstack/localstack:latest
+    environment: 
+      - AWS_DEFAULT_REGION=us-east-2
+      - SERVICES=s3
+    ports: 
+      - '4566:4566'
+    volumes: 
+      - localstack:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  localstack:

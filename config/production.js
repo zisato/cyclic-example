@@ -10,6 +10,8 @@ module.exports = {
     }
   },
   s3: {
-    bucketName: process.env.CYCLIC_BUCKET_NAME
+    bucketName: process.env.CYCLIC_BUCKET_NAME,
+    endpoint: undefined,
+    forcePathStyle: false
   },
 }
