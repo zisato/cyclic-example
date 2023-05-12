@@ -11,8 +11,8 @@ type JsonApiOrderItem = {
 export default class JsonApiOrderItemTransformer {
     constructor(private readonly fileStorageService: FileStorageService) {}
 
-    transform(orderItem: OrderItemDetail): JsonApiOrderItem {
-        const fileAsDataUrl = this.getFileAsDataUrl(orderItem.image)
+    async transform(orderItem: OrderItemDetail): Promise<JsonApiOrderItem> {
+        const fileAsDataUrl = await this.getFileAsDataUrl(orderItem.image)
 
         return {
             productId: orderItem.productId,
@@ -22,11 +22,13 @@ export default class JsonApiOrderItemTransformer {
         }
     }
 
-    private getFileAsDataUrl(fileName: string | null): string | null {
+    private async getFileAsDataUrl(fileName: string | null): Promise<string | null> {
         if (fileName === null) {
             return null
         }
 
-        return this.fileStorageService.get(fileName).asDataUrl()
+        const file = await this.fileStorageService.get(fileName)
+
+        return file.asDataUrl()
     }
 }

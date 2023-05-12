@@ -1,7 +1,7 @@
 import { File } from './file'
 
 export interface FileStorageService {
-    put(file: File): string
+    put(file: File): Promise<string>
 
-    get(fileName: string): File
+    get(fileName: string): Promise<File>
 }

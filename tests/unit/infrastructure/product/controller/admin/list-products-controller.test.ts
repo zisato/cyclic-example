@@ -8,7 +8,6 @@ import { UuidV1 } from '../../../../../../src/infrastructure/identity/uuid-v1'
 import { FindStoreBySellerIdQuery } from '../../../../../../src/application/store/find-by-seller-id/find-store-by-seller-id-query'
 import CreateDemo from '../../../../../../src/application/demo/create/create-demo'
 import { Store } from '../../../../../../src/domain/store/store'
-import JsonApiProductDetailTransformer from '../../../../../../src/infrastructure/product/transformer/json-api-product-detail-transformer'
 import JsonApiStoreTransformer from '../../../../../../src/infrastructure/store/transformer/json-api-store-transformer'
 import JsonApiProductTransformer from '../../../../../../src/infrastructure/product/transformer/json-api-product-transformer'
 
@@ -18,7 +17,7 @@ describe('ListProductsController unit test', () => {
     response: Partial<Response>
     listProducts: Partial<ListProducts>,
     findStoreBySellerId: Partial<FindStoreBySellerId>,
-    jsonApiProductTransformer: Partial<JsonApiProductDetailTransformer>,
+    jsonApiProductTransformer: Partial<JsonApiProductTransformer>,
     jsonApiStoreTransformer: Partial<JsonApiStoreTransformer>,
   } = {
     request: {

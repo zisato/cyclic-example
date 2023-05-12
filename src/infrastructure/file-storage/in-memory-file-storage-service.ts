@@ -20,7 +20,7 @@ export default class InMemoryFileStorageService implements FileStorageService {
         this.data = {}
     }
 
-    put(file: File): string {
+    async put(file: File): Promise<string> {
         const fileName = this.generateFilename(file)
 
         this.data[fileName] = file
@@ -28,7 +28,7 @@ export default class InMemoryFileStorageService implements FileStorageService {
         return fileName
     }
 
-    get(fileName: string): File {
+    async get(fileName: string): Promise<File> {
         if (!this.data[fileName]) {
             throw new Error('No File for filename exists')
         }

@@ -12,14 +12,18 @@ type JsonApiProductDetail = {
 export default class JsonApiProductDetailTransformer {
     constructor(private readonly fileStorageService: FileStorageService) {}
 
-    transformArray(products: Product[]): JsonApiProductDetail[] {
-        return products.map((product: Product) => {
-            return this.transform(product)
-        })
+    async transformArray(products: Product[]): Promise<JsonApiProductDetail[]> {
+        const result = []
+
+        for (const product of products) {
+            result.push(await this.transform(product))
+        }
+
+        return result
     }
 
-    transform(product: Product): JsonApiProductDetail {
-        const imageAsDataUrl = this.getFileAsDataUrl(product.imageFilename)
+    async transform(product: Product): Promise<JsonApiProductDetail> {
+        const imageAsDataUrl = await this.getFileAsDataUrl(product.imageFilename)
 
         return {
             id: product.id.value,
@@ -30,12 +34,12 @@ export default class JsonApiProductDetailTransformer {
         }
     }
 
-    private getFileAsDataUrl(imageFilename: string | null): string | null {
+    private async getFileAsDataUrl(imageFilename: string | null): Promise<string | null> {
         if (!imageFilename) {
             return null
         }
 
-        const file = this.fileStorageService.get(imageFilename)
+        const file = await this.fileStorageService.get(imageFilename)
 
         return file.asDataUrl()
     }

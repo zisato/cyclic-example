@@ -1,21 +1,49 @@
+import { UuidV1 } from '../identity/uuid-v1'
 import { File } from './file'
 import { FileStorageService } from './file-storage-service'
-// import { S3 } from '@aws-sdk/client-s3'
+import { S3 } from '@aws-sdk/client-s3'
 
 export class S3FileStorageService implements FileStorageService {
-    get(fileName: string): File {
-        console.log('S3FileStorageService get', fileName)
-        throw new Error('Method not implemented.')
-    }
-    // constructor(private readonly s3Client: S3) {}
+    constructor(private readonly s3Client: S3, private readonly bucketName: string) {}
 
-    put(file: File): string {
-        console.log('S3FileStorageService put', file)
-        throw new Error('not implemented')
-        // this.s3Client.putObject({
-        //     Body: file.data,
-        //     Bucket: process.env.BUCKET,
-        //     Key: file.name,
-        // })
+    async get(fileName: string): Promise<File> {
+        const result = await this.s3Client.getObject({
+            Bucket: this.bucketName,
+            Key: fileName
+        })
+        
+        if (!result.Body) {
+            throw new Error('Empty body')
+        }
+
+        const metadata = result.Metadata ?? {}
+
+        if (!metadata.name || !metadata.mimeType || !metadata.size) {
+            throw new Error('Missing metadata keys')
+        }
+
+        return new File({
+            name: metadata.name,
+            mimeType: metadata.mimeType,
+            size: Number.parseInt(metadata.size),
+            data: Buffer.from(await result.Body.transformToString())
+        })
+    }
+
+    async put(file: File): Promise<string> {
+        const randomFilename = UuidV1.create().value
+
+        await this.s3Client.putObject({
+            Body: file.data,
+            Bucket: this.bucketName,
+            Key: randomFilename,
+            Metadata: {
+                size: file.size.toString(),
+                mimeType: file.mimeType,
+                name: file.name
+            }
+        })
+
+        return randomFilename
     }
 }

@@ -28,7 +28,7 @@ export default class UpdateProductController {
 
       if (updateProductForm.isValid()) {
         const updateProductFormData = updateProductForm.getData()
-        const imageFilename = this.getImageFilename(updateProductFormData.attributes.image)
+        const imageFilename = await this.getImageFilename(updateProductFormData.attributes.image)
 
         await this.updateProduct.execute(new UpdateProductCommand(product.id.value, updateProductFormData.attributes.name, imageFilename))
       }
@@ -36,7 +36,7 @@ export default class UpdateProductController {
       return res.redirect(`/admin/products/${product.id.value}/update`)
     }
 
-    const productJsonApi = this.jsonApiProductDetailTransformer.transform(product)
+    const productJsonApi = await this.jsonApiProductDetailTransformer.transform(product)
 
     res.status(200).render('admin/product/update', {
       product: productJsonApi
@@ -47,7 +47,7 @@ export default class UpdateProductController {
     return await this.findProductById.execute(new FindProductByIdQuery(productId))
   }
 
-  private getImageFilename(uploadedFile?: UploadedFile): string | undefined {
+  private async getImageFilename(uploadedFile?: UploadedFile): Promise<string | undefined> {
     if (!uploadedFile) {
       return
     }
@@ -59,6 +59,6 @@ export default class UpdateProductController {
       data: uploadedFile.data
     })
 
-    return this.fileStorageService.put(file)    
+    return await this.fileStorageService.put(file)    
   }
 }

@@ -20,7 +20,7 @@ export default class ListOrdersController {
         const store = await this.getStore(sellerId)
         const storeJsonApi = this.jsonApiStoreTransformer.transform(store)
         const orders = await this.findOrdersByStoreId.execute(new FindOrdersByStoreIdQuery(store.id.value))
-        const ordersJsonApi = this.jsonApiOrderDetailTransformer.transformArray(orders)
+        const ordersJsonApi = await this.jsonApiOrderDetailTransformer.transformArray(orders)
 
         res.status(200).render('admin/order/list', {
             store: storeJsonApi,

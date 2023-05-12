@@ -18,8 +18,8 @@ export type JsonApiOrder = {
 export default class JsonApiOrderTransformer {
     constructor(private readonly jsonApiOrderItemTransformer: JsonApiOrderItemTransformer) {}
 
-    transform(order: OrderDetail): JsonApiOrder {
-        const orderItems = this.getOrderItems(order.items)
+    async transform(order: OrderDetail): Promise<JsonApiOrder> {
+        const orderItems = await this.getOrderItems(order.items)
 
         return {
             id: order.id.value,
@@ -29,11 +29,11 @@ export default class JsonApiOrderTransformer {
         }
     }
 
-    private getOrderItems(items: OrderItemDetail[]): JsonApiOrderItem[] {
+    private async getOrderItems(items: OrderItemDetail[]): Promise<JsonApiOrderItem[]> {
         const result: JsonApiOrderItem[] = []
 
         for (const item of items) {
-            const jsonApiOrderItemDetail = this.jsonApiOrderItemTransformer.transform(item)
+            const jsonApiOrderItemDetail = await this.jsonApiOrderItemTransformer.transform(item)
 
             result.push(jsonApiOrderItemDetail)
         }

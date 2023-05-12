@@ -32,7 +32,7 @@ export default class CreateProductController {
         const sellerId = this.getSellerId(req)
         const storeId = await this.getStoreId(sellerId)
         const createProductFormData = createProductForm.getData()
-        const imageFilename = this.getImageFilename(createProductFormData.attributes.image)
+        const imageFilename = await this.getImageFilename(createProductFormData.attributes.image)
 
         const command = new CreateProductCommand(
           UuidV1.create().value,
@@ -70,7 +70,7 @@ export default class CreateProductController {
     return store.id
   }
 
-  private getImageFilename(uploadedFile?: UploadedFile): string | undefined {
+  private async getImageFilename(uploadedFile?: UploadedFile): Promise<string | undefined> {
     if (!uploadedFile) {
       return
     }
@@ -82,6 +82,6 @@ export default class CreateProductController {
       data: uploadedFile.data
     })
 
-    return this.fileStorageService.put(file)    
+    return await this.fileStorageService.put(file)    
   }
 }
