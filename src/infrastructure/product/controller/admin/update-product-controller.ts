@@ -9,6 +9,7 @@ import JsonApiProductDetailTransformer from '../../transformer/json-api-product-
 import { FileStorageService } from '../../../file-storage/file-storage-service'
 import { UploadedFile } from 'express-fileupload'
 import { File } from '../../../file-storage/file'
+import sharp from 'sharp'
 
 export default class UpdateProductController {
   constructor(
@@ -52,11 +53,13 @@ export default class UpdateProductController {
       return
     }
 
+    const resizedImageData = await sharp(uploadedFile.data).resize(450, 200).toBuffer()
+
     const file = new File({
       name: uploadedFile.name,
       mimeType: uploadedFile.mimetype,
-      size: uploadedFile.size,
-      data: uploadedFile.data
+      size: resizedImageData.length,
+      data: resizedImageData
     })
 
     return await this.fileStorageService.put(file)    

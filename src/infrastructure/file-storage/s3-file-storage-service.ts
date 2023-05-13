@@ -26,7 +26,7 @@ export class S3FileStorageService implements FileStorageService {
             name: metadata.name,
             mimeType: metadata.mimetype,
             size: Number.parseInt(metadata.size),
-            data: Buffer.from(await result.Body.transformToString())
+            data: Buffer.from(await result.Body.transformToByteArray())
         })
     }
 
