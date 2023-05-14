@@ -4,6 +4,7 @@ import { RouterConfiguration } from '../../../src/simple-kernel/configuration/ro
 import CreateCategoryController from '../../../src/infrastructure/category/controller/admin/create-category-controller'
 import ListCategoriesController from '../../../src/infrastructure/category/controller/admin/list-categories-controller'
 import SellerAuthenticatedMiddleware from '../../../src/infrastructure/express/middleware/seller-authenticated-middleware'
+import DeleteCategoryController from '../../../src/infrastructure/category/controller/admin/delete-category-controller'
 // import { AuthRequest } from '../../../src/infrastructure/express/auth-request'
 
 /*
@@ -24,10 +25,19 @@ export class CategoryRouteLoader implements RouterConfiguration {
         const sellerAuthenticatedMiddleware = container.getTyped(SellerAuthenticatedMiddleware)
         const createCategoryController = container.getTyped(CreateCategoryController)
         const listCategoriesController = container.getTyped(ListCategoriesController)
+        const deleteCategoryController = container.getTyped(DeleteCategoryController)
 
         router.get('/admin/categories', sellerAuthenticatedMiddleware.handle, async (req: Request, res: Response, next: NextFunction) => {
             try {
                 await listCategoriesController.handle(req, res)
+            } catch (error) {
+                next(error)
+            }
+        })
+
+        router.delete('/admin/categories/:categoryId', sellerAuthenticatedMiddleware.handle, async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                await deleteCategoryController.handle(req, res)
             } catch (error) {
                 next(error)
             }

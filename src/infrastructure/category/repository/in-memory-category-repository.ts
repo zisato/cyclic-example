@@ -26,4 +26,14 @@ export default class InMemoryCategoryRepository implements CategoryRepository {
             this.data.push(category)
         }
     }
+
+    async delete(id: Identity): Promise<void> {
+        const existingCategoryIndex = this.data.findIndex((data: Category) => {
+            return id.equals(data.id)
+        })
+
+        if (existingCategoryIndex >= 0) {
+            this.data.splice(existingCategoryIndex, 1)
+        }
+    }
 }

@@ -14,6 +14,9 @@ module.exports = {
     endpoint: 'http://localstack:4566',
     forcePathStyle: true
   },
+  dynamodb: {
+    endpoint: 'http://localstack:4566'
+  },
   express: {
     port: process.env.HTTP_PORT,
     middlewares: {

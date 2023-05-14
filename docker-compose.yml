@@ -23,7 +23,8 @@ services:
     image: localstack/localstack:latest
     environment: 
       - AWS_DEFAULT_REGION=us-east-2
-      - SERVICES=s3
+      - SERVICES=s3,dynamodb
+      - DYNAMODB_SHARE_DB=1
     ports: 
       - '4566:4566'
     volumes: 

@@ -11,6 +11,7 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Name</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -18,12 +19,18 @@
                                 <tr>
                                     <th scope="row">{{@index}}</th>
                                     <td>{{this.attributes.name}}</td>
+                                    <td>
+                                        <form method="post" action="/admin/categories/{{this.id}}">
+                                            <input type="hidden" name="_method" value="DELETE" />
+                                            <button class="btn-close btn-sm btn-danger" type="submit"></button>
+                                        </form>
+                                    </td>
                                 </tr>
                             {{/each}}
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="2">
+                                <td colspan="3">
                                     <div class="container d-flex justify-content-end">
                                         Total: {{categories.length}}
                                     </div>

@@ -5,4 +5,5 @@ export interface CategoryRepository {
     find: () => Promise<Category[]>
     exists: (id: Identity) => Promise<boolean>
     save: (category: Category) => Promise<void>
+    delete: (id: Identity) => Promise<void>
 }
