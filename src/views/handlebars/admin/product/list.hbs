@@ -1,41 +1,19 @@
-<main>
-    <section class="py-5">
-        <div class="container px-4 px-lg-5 mt-5">
-            <div class="row">
-                <div class="container d-flex justify-content-end">
-                    <a href="/admin/products/create" class="btn btn-primary">Create</a>
-                </div>
-                <div class="container d-flex">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{#each products}}
-                                <tr>
-                                    <th scope="row">{{@index}}</th>
-                                    <td>{{this.attributes.name}}</td>
-                                    <td><a href="/admin/products/{{this.id}}/update" class="btn btn-primary">Edit</a></td>
-                                </tr>
-                            {{/each}}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="3">
-                                    <div class="container d-flex justify-content-end">
-                                        Total: {{products.length}}
-                                    </div>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-
-</main>
+{{#*inline "thead"}}
+<th scope="col">#</th>
+<th scope="col">Name</th>
+<th scope="col">Actions</th>
+{{/inline}}
+{{#*inline "tbody"}}
+<th scope="row">{{@index}}</th>
+<td>{{this.attributes.name}}</td>
+<td>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <a href="/admin/products/{{this.id}}/update" class="btn btn-sm btn-primary">Edit</a>
+        <form method="post" action="/admin/products/{{this.id}}">
+            <input type="hidden" name="_method" value="DELETE" />
+            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+        </form>
+    </div>
+</td>
+{{/inline}}
+{{>list createRoute='/admin/products/create' items=products}}

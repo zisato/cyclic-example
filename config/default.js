@@ -26,7 +26,11 @@ module.exports = {
     },
     viewEngine: {
       views: path.join(__dirname, '..', 'src', 'views/handlebars'),
-      layoutsDir: path.join(__dirname, '..', 'src', 'views/handlebars/layouts')
+      layoutsDir: path.join(__dirname, '..', 'src', 'views/handlebars/layouts'),
+      partialsDir: [
+        path.join(__dirname, '..', 'src', 'views/handlebars/partials'),
+        path.join(__dirname, '..', 'src', 'views/handlebars/admin/partials')
+      ]
     }
   }
 }

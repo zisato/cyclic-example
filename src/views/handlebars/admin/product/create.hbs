@@ -1,3 +1,26 @@
+{{#*inline "form"}}
+<form enctype="multipart/form-data" action="/admin/products/create" method="post" name="product">
+    <div class="mb-3">
+        <label for="attributes[name]" class="form-label">Name</label>
+        <input type="text" class="form-control" name="attributes[name]"/>
+    </div>
+    <div class="mb-3">
+        <label for="relationships[category][id]" class="form-label">Category</label>
+        <select class="form-select" name="relationships[category][id]" aria-label="Select category">
+            {{#each categories}}
+                <option value="{{this.id}}">{{this.attributes.name}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="attributes[image]" class="form-label">Image</label>
+        <input type="file" class="form-control" name="attributes[image]"/>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{{/inline}}
+{{>create modelName='product'}}
+
 <main>
     <section class="py-5">
         <div class="container px-4 px-lg-5 justify-content-center">

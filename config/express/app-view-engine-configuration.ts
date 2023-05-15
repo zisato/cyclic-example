@@ -12,7 +12,8 @@ export class AppViewEngineConfiguration implements ViewConfiguration {
                 fn: engine({
                     layoutsDir: parameters.get<string>('express.viewEngine.layoutsDir'),
                     defaultLayout: 'layout',
-                    extname: '.hbs'
+                    extname: '.hbs',
+                    partialsDir: parameters.get<string[]>('express.viewEngine.partialsDir')
                 })
             }
         }

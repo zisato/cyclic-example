@@ -1,17 +1,10 @@
-<main>
-    <section class="py-5">
-        <div class="container px-4 px-lg-5 justify-content-center">
-            <h4>Create category</h4>
-        </div>
-        <div class="container px-4 px-lg-5 mt-5">
-            <form enctype="application/x-www-form-urlencoded" action="/admin/categories/create" method="post" name="category">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" name="attributes[name]">
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-        </div>
-    </section>
-
-</main>
+{{#*inline "form"}}
+<form enctype="application/x-www-form-urlencoded" action="/admin/categories/create" method="post" name="category">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" name="attributes[name]">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{{/inline}}
+{{>create modelName='category'}}

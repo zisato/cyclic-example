@@ -1,103 +1,52 @@
 import { Seller } from '../../../domain/seller/seller'
 import { SellerRepository } from '../../../domain/seller/repository/seller-repository'
-// import CyclicDB from '@cyclic.sh/dynamodb'
-// import CyclicItem from '@cyclic.sh/dynamodb/dist/cy_db_item'
 import { Identity } from '../../../domain/identity/identity'
-import { AttributeValue, DynamoDBClient, GetItemCommand, PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { UuidV1 } from '../../identity/uuid-v1'
-// import { UuidV1 } from '../../identity/uuid-v1'
+import { DynamodbRepository } from '../../dynamodb/dynamodb-repository'
 
-export default class DynamodbSellerRepository implements SellerRepository {
+export default class DynamodbSellerRepository extends DynamodbRepository<Seller> implements SellerRepository {
     private readonly tableName = 'seller'
 
-    constructor(private readonly dynamoDBClient: DynamoDBClient) {}
+    constructor(dynamoDBClient: DynamoDBClient) {
+        super(dynamoDBClient)
+    }
+
+    getTableName(): string {
+        return this.tableName
+    }
 
     async find(): Promise<Seller[]> {
-        const results = await this.dynamoDBClient.send(new QueryCommand({
-            TableName: this.tableName
-        }))
-
-        if (!results.Items) {
-            return []
-        }
-
-        return results.Items.map((item) => {
-            return this.itemToSeller(item)
-        })
-        /*
-        const collection = this.cyclicDB.collection(this.collectionName)
-        const results: Seller[] = []
-        const dbResults = (await collection.list()).results
-
-        for (const result of dbResults) {
-            const item: CyclicItem = await result.get()
-            const seller = new Seller({
-                id: new UuidV1(item.key),
-                name: item.props.name
-            })
-
-            results.push(seller)
-        }
-
-        return results
-        */
+        return await this.listItems()
     }
 
     async exists (id: Identity): Promise<boolean> {
-        const result = await this.dynamoDBClient.send(new GetItemCommand({
-            TableName: this.tableName,
-            Key: {
-                id: { S: id.value }
-            }
-        }))
-
-        return result.Item !== undefined
-        /*
-        const collection = this.cyclicDB.collection(this.collectionName)
-
-        return await collection.get(id.value) !== null
-        */
+        return await this.getItem(id.value) !== undefined
     }
 
     async save (seller: Seller): Promise<void> {
-        const item = this.sellerToItem(seller)
-
-        await this.dynamoDBClient.send(new PutItemCommand({
-            TableName: this.tableName,
-            Item: item
-        }))
-        /*
-        const collection = this.cyclicDB.collection(this.collectionName)
-
-        await collection.set(
-            seller.id.value,
-            {
-                name: seller.name
-            },
-            {}
-        )
-        */
+        await this.saveItem(seller)
     }
 
-    private sellerToItem(seller: Seller): Record<string, AttributeValue> {
+    modelToItem(seller: Seller): Record<string, any> {
         return {
             id: { S: seller.id.value },
             name: { S: seller.name }
         }
     }
 
-    private itemToSeller(item: Record<string, AttributeValue>): Seller {
-        if (!item.id.S) {
+    itemToModel(item: Record<string, any>): Seller {
+        if (!item.id) {
             throw new Error('Required id property')
         }
 
-        if (!item.name.S) {
+        if (!item.name) {
             throw new Error('Required name property')
         }
 
         return new Seller({
-            id: new UuidV1(item.id.S),
-            name: item.name.S
+            id: new UuidV1(item.id),
+            name: item.name
         })
     }
 }

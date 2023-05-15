@@ -1,3 +1,23 @@
+{{#*inline "thead"}}
+<th scope="col">#</th>
+<th scope="col">Name</th>
+<th scope="col">Actions</th>
+{{/inline}}
+{{#*inline "tbody"}}
+<th scope="row">{{@index}}</th>
+<td>{{this.attributes.name}}</td>
+<td>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <form method="post" action="/admin/categories/{{this.id}}">
+            <input type="hidden" name="_method" value="DELETE" />
+            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+        </form>
+    </div>
+</td>
+{{/inline}}
+{{>list createRoute='/admin/categories/create' items=categories}}
+
+<!--
 <main>
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
@@ -44,3 +64,4 @@
     </section>
 
 </main>
+-->
